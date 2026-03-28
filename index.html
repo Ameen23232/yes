@@ -6,82 +6,59 @@
 
 <title>نظام العملاء</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+
 <style>
 body {
   margin:0;
-  font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background:#0b0b0f;
-  color:#fff;
+  font-family:'Cairo';
+  background:#0f0f0f;
+  color:white;
   display:flex;
   justify-content:center;
   align-items:center;
   height:100vh;
 }
 
-/* الشاشات */
 .screen {
   display:none;
   width:90%;
   max-width:420px;
   text-align:center;
 }
+
 .active {display:block;}
 
-/* الكارد */
-.card {
-  background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(20px);
-  border-radius:22px;
-  padding:25px;
-  box-shadow:0 0 25px rgba(140,80,255,0.15);
-}
-
-/* النص */
 h2 {font-size:26px;font-weight:700;}
 h3 {font-size:22px;font-weight:600;}
 
-/* المدخلات */
 input {
   width:100%;
-  padding:15px;
+  padding:14px;
   margin:10px 0;
-  border-radius:14px;
+  border-radius:12px;
   border:none;
-  background:rgba(255,255,255,0.07);
+  background:#1c1c1c;
   color:white;
   font-size:16px;
-  font-weight:500;
 }
 
-/* الأزرار */
 button {
   width:100%;
-  padding:15px;
+  padding:14px;
   margin:10px 0;
   border:none;
-  border-radius:18px;
-  background:linear-gradient(145deg,#7c4dff,#5e35b1);
+  border-radius:16px;
+  background:#8a2be2;
   color:white;
   font-size:17px;
   font-weight:600;
   cursor:pointer;
-  transition:0.25s;
-  box-shadow:0 0 12px rgba(124,77,255,0.4);
 }
 
-button:hover {
-  transform:translateY(-2px);
-  box-shadow:0 0 20px rgba(124,77,255,0.7);
-}
-
-button:active {
-  transform:scale(0.96);
-}
-
-/* الحالة */
 #statusBox {
   margin-top:25px;
-  font-size:24px;
+  font-size:22px;
   font-weight:700;
 }
 </style>
@@ -90,14 +67,14 @@ button:active {
 <body>
 
 <!-- الرئيسية -->
-<div id="home" class="screen active card">
+<div id="home" class="screen active">
   <h2>👋 مرحبًا</h2>
   <button onclick="go('add')">➕ إضافة بيانات</button>
   <button onclick="go('search')">🔍 البحث</button>
 </div>
 
 <!-- إضافة -->
-<div id="add" class="screen card">
+<div id="add" class="screen">
   <h3>إضافة عميل</h3>
   <input id="name" placeholder="الاسم">
   <input id="phone" placeholder="رقم الهاتف">
@@ -107,27 +84,29 @@ button:active {
 </div>
 
 <!-- نجاح -->
-<div id="success" class="screen card">
+<div id="success" class="screen">
   <h2>تم الإرسال ✅</h2>
   <button onclick="location.reload()">إدخال جديد</button>
 </div>
 
 <!-- البحث -->
-<div id="search" class="screen card">
+<div id="search" class="screen">
   <h3>بحث برقم الهاتف</h3>
 
-  <input id="searchPhone" placeholder="اكتب رقم الهاتف">
+  <input id="searchPhone" placeholder="رقم الهاتف">
   <button onclick="find()">بحث</button>
 
   <div id="statusBox"></div>
 
   <button id="editBtn" style="display:none;" onclick="askPassword()">تعديل الحالة</button>
 
+  <!-- كلمة المرور -->
   <div id="passwordBox" style="display:none;">
     <input id="password" type="password" placeholder="كلمة المرور">
     <button onclick="checkPassword()">تأكيد</button>
   </div>
 
+  <!-- التعديل -->
   <div id="editArea" style="display:none;">
     <input id="newStatus" placeholder="اكتب الحالة">
     <button onclick="updateStatus()">حفظ التعديل</button>
@@ -137,7 +116,7 @@ button:active {
 </div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbz3QPyk9a65_uABv_fNKISMTggIYkISchMiUIRJoYrGlhm0mnkJZ-qwlIQlbCbOGNx_/exec";
+const API = "PUT_YOUR_API_LINK_HERE";
 
 /* التنقل */
 function go(id){
@@ -145,7 +124,7 @@ function go(id){
   document.getElementById(id).classList.add('active');
 }
 
-/* حفظ */
+/* إضافة */
 async function save(){
   const data = {
     name: name.value,
@@ -161,33 +140,28 @@ async function save(){
 let currentRow=null;
 
 async function find(){
-  const phoneVal = document.getElementById("searchPhone").value;
+  const phoneVal = searchPhone.value;
   const box = document.getElementById("statusBox");
 
   if(!phoneVal){
-    box.innerHTML="⚠️ اكتب رقم أولًا";
+    box.innerHTML="⚠️ اكتب رقم";
     return;
   }
 
-  try{
-    const res = await fetch(API+"?phone="+phoneVal);
-    const data = await res.json();
+  const res = await fetch(API+"?phone="+phoneVal);
+  const data = await res.json();
 
-    if(data.error){
-      box.innerHTML="❌ غير موجود";
-      editBtn.style.display="none";
-      return;
-    }
-
-    currentRow = data.row;
-
-    box.innerHTML = data.status ? "📦 "+data.status : "لا توجد حالة";
-
-    document.getElementById("editBtn").style.display="block";
-
-  }catch(err){
-    box.innerHTML="⚠️ خطأ في الاتصال";
+  if(data.error){
+    box.innerHTML="❌ غير موجود";
+    editBtn.style.display="none";
+    return;
   }
+
+  currentRow = data.row;
+
+  box.innerHTML = data.status ? "📦 "+data.status : "لا توجد حالة";
+
+  document.getElementById("editBtn").style.display="block";
 }
 
 /* كلمة المرور */
@@ -197,10 +171,10 @@ function askPassword(){
 
 function checkPassword(){
   if(password.value==="Admin"){
-    editArea.style.display="block";
     passwordBox.style.display="none";
+    editArea.style.display="block";
   }else{
-    alert("كلمة المرور خطأ");
+    alert("❌ كلمة المرور خطأ");
   }
 }
 
