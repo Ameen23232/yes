@@ -13,6 +13,8 @@ button { background:#007aff; color:white; border:none; cursor:pointer; }
 button.green { background:green; }
 .message { text-align:center; margin-top:15px; font-weight:bold; }
 </style>
+
+<!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
@@ -27,23 +29,38 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+
+let confirmationResult;
+let currentShipmentId = null;
+
+// إنشاء reCAPTCHA عند تحميل الصفحة
+window.onload = function() {
+  window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+    'size': 'normal',
+    'callback': (response) => { console.log("reCAPTCHA حلّ"); }
+  }, auth);
+  window.recaptchaVerifier.render();
+};
 </script>
 </head>
 <body>
 
+<!-- شاشة تسجيل الدخول -->
 <div class="container" id="loginDiv">
   <h2>تسجيل الدخول</h2>
-  <input type="tel" id="phone" placeholder="أدخل رقم هاتفك">
+  <input type="tel" id="phone" placeholder="أدخل رقم هاتفك مثل +201234567890">
   <div id="recaptcha-container"></div>
-  <button onclick="sendOTP()">إرسال الرمز</button>
+  <button id="sendBtn">إرسال الرمز</button>
 </div>
 
+<!-- شاشة إدخال OTP -->
 <div class="container" id="otpDiv" style="display:none;">
   <h2>أدخل الرمز</h2>
   <input type="text" id="otpCode" placeholder="الرمز">
   <button onclick="verifyOTP()">تأكيد</button>
 </div>
 
+<!-- شاشة تسجيل الشحنة -->
 <div class="container" id="formDiv" style="display:none;">
   <h2>تسجيل شحنة جديدة</h2>
   <input type="text" id="name" placeholder="أسم المستلم">
@@ -71,35 +88,37 @@ const auth = getAuth(app);
   <button id="trackBtn" class="green" style="display:none;" onclick="trackShipment()">تتبع الشحنة</button>
 </div>
 
-<script>
-let confirmationResult;
-let currentShipmentId = null;
+<script type="module">
+// إرسال OTP
+document.getElementById("sendBtn").addEventListener("click", function() {
+  const phoneNumber = document.getElementById("phone").value.trim();
+  if(!phoneNumber.startsWith("+")) { alert("الرقم يجب أن يبدأ بالرمز الدولي مثل +201234567890"); return; }
 
-function sendOTP() {
-  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
-  const phoneNumber = document.getElementById('phone').value;
   signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier)
     .then((result) => {
       confirmationResult = result;
       document.getElementById('loginDiv').style.display = 'none';
       document.getElementById('otpDiv').style.display = 'block';
-    }).catch((error) => alert(error));
-}
+      alert("تم إرسال الرمز لهاتفك");
+    }).catch((error) => { console.error(error); alert("خطأ في إرسال الرمز: " + error.message); });
+});
 
+// تحقق OTP
 function verifyOTP() {
   const code = document.getElementById('otpCode').value;
-  confirmationResult.confirm(code).then((result) => {
-    document.getElementById('otpDiv').style.display = 'none';
-    document.getElementById('formDiv').style.display = 'block';
-  }).catch((error) => alert(error));
+  confirmationResult.confirm(code)
+    .then(() => {
+      document.getElementById('otpDiv').style.display = 'none';
+      document.getElementById('formDiv').style.display = 'block';
+    }).catch((error) => { alert("رمز خاطئ: " + error.message); });
 }
 
+// المحافظات والمدن
 const cities = {
   "Giza":["6th of October","Dokki","Haram"],
   "Cairo":["Nasr City","Heliopolis","Maadi"],
   "Qalyubia":["Shubra El-Kheima","Banha","Qalyub"]
 };
-
 function populateCities() {
   const gov = document.getElementById('gov').value;
   const citySelect = document.getElementById('city');
@@ -107,6 +126,7 @@ function populateCities() {
   if(cities[gov]) cities[gov].forEach(c => citySelect.innerHTML += `<option value="${c}">${c}</option>`);
 }
 
+// تسجيل الشحنة
 function registerShipment() {
   const data = {
     name: document.getElementById('name').value,
@@ -125,18 +145,17 @@ function registerShipment() {
     method:"POST",
     headers:{ "Content-Type":"application/json" },
     body: JSON.stringify(data)
-  }).then(res => res.json()).then(res => {
+  }).then(res => res.json())
+  .then(res => {
     if(res.status=="success"){
       currentShipmentId = res.shipmentId;
       document.getElementById('msg').innerText = "تم تسجيل الشحنة. تحت المراجعة";
       checkShipmentStatus();
-    } else {
-      document.getElementById('msg').innerText = "حدث خطأ: " + res.message;
-    }
+    } else { document.getElementById('msg').innerText = "حدث خطأ: " + res.message; }
   });
 }
 
-// التحقق من حالة الشحنة كل 5 ثواني
+// متابعة حالة الشحنة من Sheet2
 function checkShipmentStatus(){
   if(!currentShipmentId) return;
   fetch("https://script.google.com/macros/s/AKfycbyf0bNSeG6RW_A22nRHwJczj9lN_IaG1Sqs6Vq5Z0YGEdTtoZHtkLYgpHigOiatCOeA/exec")
@@ -145,14 +164,13 @@ function checkShipmentStatus(){
       if(shipment && shipment[1]){
         document.getElementById('msg').innerText = "";
         document.getElementById('trackBtn').style.display = 'block';
-      } else {
-        setTimeout(checkShipmentStatus, 5000);
-      }
+      } else { setTimeout(checkShipmentStatus, 5000); }
     });
 }
 
+// تتبع الشحنة
 function trackShipment(){
-  alert("سيتم تحويلك إلى صفحة تتبع الشحنة أو API التتبع هنا");
+  alert("سيتم فتح صفحة تتبع الشحنة أو تنفيذ API تتبع هنا");
 }
 </script>
 
