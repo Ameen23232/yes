@@ -3,200 +3,156 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>نظام العملاء</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-
+<title>تسجيل الشحنات</title>
 <style>
-body {
-  margin:0;
-  font-family:'Cairo';
-  background:#0f0f0f;
-  color:white;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-}
-
-.screen {
-  display:none;
-  width:90%;
-  max-width:420px;
-  text-align:center;
-}
-
-.active {display:block;}
-
-h2 {font-size:26px;font-weight:700;}
-h3 {font-size:22px;font-weight:600;}
-
-input {
-  width:100%;
-  padding:14px;
-  margin:10px 0;
-  border-radius:12px;
-  border:none;
-  background:#1c1c1c;
-  color:white;
-  font-size:16px;
-}
-
-button {
-  width:100%;
-  padding:14px;
-  margin:10px 0;
-  border:none;
-  border-radius:16px;
-  background:#8a2be2;
-  color:white;
-  font-size:17px;
-  font-weight:600;
-  cursor:pointer;
-}
-
-#statusBox {
-  margin-top:25px;
-  font-size:22px;
-  font-weight:700;
-}
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background:#f2f2f7; margin:0; }
+.container { max-width: 500px; margin: auto; padding:20px; background:white; border-radius:20px; margin-top:50px; box-shadow:0 5px 15px rgba(0,0,0,0.1);}
+h2 { text-align:center; }
+input, select, button { width:100%; padding:12px; margin:8px 0; border-radius:10px; border:1px solid #ccc; font-size:16px; }
+button { background:#007aff; color:white; border:none; cursor:pointer; }
+button.green { background:green; }
+.message { text-align:center; margin-top:15px; font-weight:bold; }
 </style>
-</head>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
+const firebaseConfig = {
+  apiKey: "AIzaSyDldtKeMmupSmdVpnfq_nnh2ojghsZwtNI",
+  authDomain: "otp1-987a0.firebaseapp.com",
+  projectId: "otp1-987a0",
+  storageBucket: "otp1-987a0.appspot.com",
+  messagingSenderId: "269070576901",
+  appId: "1:269070576901:web:cc6c4f5da19158f96b5b6c"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+</script>
+</head>
 <body>
 
-<!-- الرئيسية -->
-<div id="home" class="screen active">
-  <h2>👋 مرحبًا</h2>
-  <button onclick="go('add')">➕ إضافة بيانات</button>
-  <button onclick="go('search')">🔍 البحث</button>
+<div class="container" id="loginDiv">
+  <h2>تسجيل الدخول</h2>
+  <input type="tel" id="phone" placeholder="أدخل رقم هاتفك">
+  <div id="recaptcha-container"></div>
+  <button onclick="sendOTP()">إرسال الرمز</button>
 </div>
 
-<!-- إضافة -->
-<div id="add" class="screen">
-  <h3>إضافة عميل</h3>
-  <input id="name" placeholder="الاسم">
-  <input id="phone" placeholder="رقم الهاتف">
-  <input id="address" placeholder="العنوان">
-  <button onclick="save()">حفظ</button>
-  <button onclick="go('home')">رجوع</button>
+<div class="container" id="otpDiv" style="display:none;">
+  <h2>أدخل الرمز</h2>
+  <input type="text" id="otpCode" placeholder="الرمز">
+  <button onclick="verifyOTP()">تأكيد</button>
 </div>
 
-<!-- نجاح -->
-<div id="success" class="screen">
-  <h2>تم الإرسال ✅</h2>
-  <button onclick="location.reload()">إدخال جديد</button>
-</div>
-
-<!-- البحث -->
-<div id="search" class="screen">
-  <h3>بحث برقم الهاتف</h3>
-
-  <input id="searchPhone" placeholder="رقم الهاتف">
-  <button onclick="find()">بحث</button>
-
-  <div id="statusBox"></div>
-
-  <button id="editBtn" style="display:none;" onclick="askPassword()">تعديل الحالة</button>
-
-  <!-- كلمة المرور -->
-  <div id="passwordBox" style="display:none;">
-    <input id="password" type="password" placeholder="كلمة المرور">
-    <button onclick="checkPassword()">تأكيد</button>
-  </div>
-
-  <!-- التعديل -->
-  <div id="editArea" style="display:none;">
-    <input id="newStatus" placeholder="اكتب الحالة">
-    <button onclick="updateStatus()">حفظ التعديل</button>
-  </div>
-
-  <button onclick="go('home')">رجوع</button>
+<div class="container" id="formDiv" style="display:none;">
+  <h2>تسجيل شحنة جديدة</h2>
+  <input type="text" id="name" placeholder="أسم المستلم">
+  <input type="tel" id="phone1" placeholder="رقم الهاتف 1">
+  <input type="tel" id="phone2" placeholder="رقم الهاتف 2">
+  <select id="gov" onchange="populateCities()">
+    <option value="">اختر المحافظة</option>
+    <option value="Giza">الجيزة</option>
+    <option value="Cairo">القاهرة</option>
+    <option value="Qalyubia">القليوبية</option>
+  </select>
+  <select id="city">
+    <option value="">اختر المدينة</option>
+  </select>
+  <input type="text" id="area" placeholder="منطقة الوصول">
+  <input type="text" id="street" placeholder="شارع المستلم">
+  <input type="number" id="weight" placeholder="وزن البضاعة (≤30kg)" max="30">
+  <input type="number" id="price" placeholder="المبلغ المطلوب تحصيله">
+  <select id="type">
+    <option value="exchange">استبدال</option>
+    <option value="normal">تسليم طبيعي</option>
+  </select>
+  <button onclick="registerShipment()">تسجيل الشحنة</button>
+  <div class="message" id="msg"></div>
+  <button id="trackBtn" class="green" style="display:none;" onclick="trackShipment()">تتبع الشحنة</button>
 </div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbyXp0fIOeBM-vDw-KsOF9_O4V8R4fr1rpwlbMP3vwZRKDtCTzHqpsv6BhRLEInL46GX/exec"; // ضع رابط الويب آب هنا
+let confirmationResult;
+let currentShipmentId = null;
 
-/* التنقل */
-function go(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+function sendOTP() {
+  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+  const phoneNumber = document.getElementById('phone').value;
+  signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier)
+    .then((result) => {
+      confirmationResult = result;
+      document.getElementById('loginDiv').style.display = 'none';
+      document.getElementById('otpDiv').style.display = 'block';
+    }).catch((error) => alert(error));
 }
 
-/* إضافة */
-async function save(){
+function verifyOTP() {
+  const code = document.getElementById('otpCode').value;
+  confirmationResult.confirm(code).then((result) => {
+    document.getElementById('otpDiv').style.display = 'none';
+    document.getElementById('formDiv').style.display = 'block';
+  }).catch((error) => alert(error));
+}
+
+const cities = {
+  "Giza":["6th of October","Dokki","Haram"],
+  "Cairo":["Nasr City","Heliopolis","Maadi"],
+  "Qalyubia":["Shubra El-Kheima","Banha","Qalyub"]
+};
+
+function populateCities() {
+  const gov = document.getElementById('gov').value;
+  const citySelect = document.getElementById('city');
+  citySelect.innerHTML = '<option value="">اختر المدينة</option>';
+  if(cities[gov]) cities[gov].forEach(c => citySelect.innerHTML += `<option value="${c}">${c}</option>`);
+}
+
+function registerShipment() {
   const data = {
-    name: name.value,
-    phone: phone.value,
-    address: address.value
+    name: document.getElementById('name').value,
+    phone1: document.getElementById('phone1').value,
+    phone2: document.getElementById('phone2').value,
+    gov: document.getElementById('gov').value,
+    city: document.getElementById('city').value,
+    area: document.getElementById('area').value,
+    street: document.getElementById('street').value,
+    weight: document.getElementById('weight').value,
+    price: document.getElementById('price').value,
+    type: document.getElementById('type').value
   };
 
-  await fetch(API,{
+  fetch("https://script.google.com/macros/s/AKfycbzIEDw1NWejQAZEC-ANVI4YMrATsCTSYj8hyz7qyolUEGJyUvnFa27Ud7sN6cdQaFw5/exec", {
     method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify(data)
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify(data)
+  }).then(res => res.json()).then(res => {
+    if(res.status=="success"){
+      currentShipmentId = res.shipmentId;
+      document.getElementById('msg').innerText = "تم تسجيل الشحنة. تحت المراجعة";
+      checkShipmentStatus();
+    } else {
+      document.getElementById('msg').innerText = "حدث خطأ: " + res.message;
+    }
   });
-
-  go("success");
 }
 
-/* البحث */
-let currentRow=null;
-
-async function find(){
-  const phoneVal = searchPhone.value;
-  const box = document.getElementById("statusBox");
-
-  if(!phoneVal){
-    box.innerHTML="⚠️ اكتب رقم";
-    return;
-  }
-
-  const res = await fetch(API+"?phone="+phoneVal);
-  const data = await res.json();
-
-  if(data.error){
-    box.innerHTML="❌ غير موجود";
-    editBtn.style.display="none";
-    return;
-  }
-
-  currentRow = data.row;
-
-  box.innerHTML = data.status ? "📦 "+data.status : "لا توجد حالة";
-
-  document.getElementById("editBtn").style.display="block";
+// التحقق من حالة الشحنة كل 5 ثواني
+function checkShipmentStatus(){
+  if(!currentShipmentId) return;
+  fetch("https://script.google.com/macros/s/AKfycbyf0bNSeG6RW_A22nRHwJczj9lN_IaG1Sqs6Vq5Z0YGEdTtoZHtkLYgpHigOiatCOeA/exec")
+    .then(res => res.json()).then(data => {
+      const shipment = data.find(s => s[0]===currentShipmentId);
+      if(shipment && shipment[1]){
+        document.getElementById('msg').innerText = "";
+        document.getElementById('trackBtn').style.display = 'block';
+      } else {
+        setTimeout(checkShipmentStatus, 5000);
+      }
+    });
 }
 
-/* كلمة المرور */
-function askPassword(){
-  document.getElementById("passwordBox").style.display="block";
-}
-
-function checkPassword(){
-  if(password.value==="Admin"){
-    passwordBox.style.display="none";
-    editArea.style.display="block";
-  }else{
-    alert("❌ كلمة المرور خطأ");
-  }
-}
-
-/* تحديث */
-async function updateStatus(){
-  await fetch(API,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      update:true,
-      row:currentRow,
-      status:newStatus.value
-    })
-  });
-
-  alert("تم التحديث ✅");
-  location.reload();
+function trackShipment(){
+  alert("سيتم تحويلك إلى صفحة تتبع الشحنة أو API التتبع هنا");
 }
 </script>
 
