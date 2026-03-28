@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>نظام العملاء</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap" rel="stylesheet">
-
 <style>
+@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600&display=swap');
+
 body {
   margin:0;
-  font-family:'Cairo';
-  background:#0f0f0f;
+  font-family:'SF Pro Display', sans-serif;
+  background:linear-gradient(135deg,#0a0a0a,#111);
   color:white;
   display:flex;
   justify-content:center;
@@ -28,23 +28,72 @@ body {
 
 .active {display:block;}
 
-button {
-  width:100%;
-  padding:15px;
-  margin:10px 0;
-  border:none;
-  border-radius:15px;
-  background:#8a2be2;
-  color:white;
-  font-size:16px;
+h2,h3 {
+  margin-bottom:20px;
 }
 
+/* Glass effect */
+.card {
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(20px);
+  border-radius:20px;
+  padding:20px;
+  box-shadow:0 0 20px rgba(138,43,226,0.2);
+}
+
+/* Inputs */
 input {
   width:100%;
-  padding:12px;
+  padding:14px;
   margin:10px 0;
-  border-radius:10px;
+  border-radius:15px;
   border:none;
+  background:rgba(255,255,255,0.08);
+  color:white;
+  outline:none;
+}
+
+/* Buttons */
+button {
+  width:100%;
+  padding:14px;
+  margin:10px 0;
+  border:none;
+  border-radius:20px;
+  background:linear-gradient(145deg,#8a2be2,#6a1bd1);
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+  transition:0.3s;
+  box-shadow:0 0 10px rgba(138,43,226,0.4);
+}
+
+button:hover {
+  transform:scale(1.03);
+  box-shadow:0 0 20px rgba(138,43,226,0.8);
+}
+
+button:active {
+  transform:scale(0.97);
+}
+
+/* Status text */
+#statusBox {
+  margin-top:25px;
+  font-size:22px;
+  font-weight:600;
+}
+
+/* Neon glow under buttons */
+button::after {
+  content:'';
+  display:block;
+  height:3px;
+  width:60%;
+  margin:8px auto 0;
+  background:#8a2be2;
+  filter:blur(6px);
+  opacity:0.6;
 }
 </style>
 </head>
@@ -52,14 +101,14 @@ input {
 <body>
 
 <!-- الرئيسية -->
-<div id="home" class="screen active">
+<div id="home" class="screen active card">
   <h2>👋 مرحبًا</h2>
   <button onclick="go('add')">➕ إضافة بيانات</button>
-  <button onclick="go('search')">🔍 البحث برقم الهاتف</button>
+  <button onclick="go('search')">🔍 البحث</button>
 </div>
 
 <!-- إضافة -->
-<div id="add" class="screen">
+<div id="add" class="screen card">
   <h3>إضافة عميل</h3>
   <input id="name" placeholder="الاسم">
   <input id="phone" placeholder="رقم الهاتف">
@@ -69,32 +118,37 @@ input {
 </div>
 
 <!-- نجاح -->
-<div id="success" class="screen">
+<div id="success" class="screen card">
   <h2>تم الإرسال ✅</h2>
   <button onclick="location.reload()">➕ إدخال جديد</button>
 </div>
 
 <!-- البحث -->
-<div id="search" class="screen">
+<div id="search" class="screen card">
   <h3>بحث برقم الهاتف</h3>
 
-  <input id="searchPhone" placeholder="اكتب رقم الهاتف">
+  <input id="searchPhone" placeholder="رقم الهاتف">
   <button onclick="find()">بحث</button>
 
-  <div id="statusBox" style="margin-top:30px;font-size:22px;"></div>
+  <div id="statusBox"></div>
 
-  <button id="editBtn" style="display:none;" onclick="enableEdit()">تعديل الحالة</button>
+  <button id="editBtn" style="display:none;" onclick="askPassword()">تعديل الحالة</button>
+
+  <div id="passwordBox" style="display:none;">
+    <input id="password" type="password" placeholder="كلمة المرور">
+    <button onclick="checkPassword()">تأكيد</button>
+  </div>
 
   <div id="editArea" style="display:none;">
     <input id="newStatus" placeholder="اكتب حالة الطلب">
-    <button onclick="updateStatus()">تأكيد التعديل</button>
+    <button onclick="updateStatus()">حفظ التعديل</button>
   </div>
 
   <button onclick="go('home')">رجوع</button>
 </div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbz92hIYcnD07tF2PBQYSBRgwy8xh4G3XHBhVr7ez3soEA3O19mM_uH1Kff8FIygprL3/exec";
+const API = "https://script.google.com/macros/s/AKfycbz3QPyk9a65_uABv_fNKISMTggIYkISchMiUIRJoYrGlhm0mnkJZ-qwlIQlbCbOGNx_/exec";
 
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -104,62 +158,60 @@ function go(id){
 /* إضافة */
 async function save(){
   const data = {
-    name: document.getElementById("name").value,
-    phone: document.getElementById("phone").value,
-    address: document.getElementById("address").value
+    name: name.value,
+    phone: phone.value,
+    address: address.value
   };
 
-  await fetch(API,{
-    method:"POST",
-    mode:"no-cors",
-    body:JSON.stringify(data)
-  });
-
+  await fetch(API,{method:"POST",mode:"no-cors",body:JSON.stringify(data)});
   go("success");
 }
 
 /* البحث */
-let currentRow = null;
+let currentRow=null;
 
 async function find(){
-  const phone = document.getElementById("searchPhone").value;
+  const phoneVal = searchPhone.value;
 
-  const res = await fetch(API + "?phone=" + phone);
+  const res = await fetch(API+"?phone="+phoneVal);
   const data = await res.json();
 
-  const box = document.getElementById("statusBox");
-
   if(data.error){
-    box.innerHTML = "❌ الرقم غير موجود";
-    document.getElementById("editBtn").style.display = "none";
+    statusBox.innerHTML="❌ غير موجود";
     return;
   }
 
-  currentRow = data.row;
+  currentRow=data.row;
 
-  box.innerHTML = data.status 
-    ? "📦 " + data.status 
-    : "لا توجد حالة بعد";
+  statusBox.innerHTML = data.status ? "📦 "+data.status : "لا توجد حالة";
 
-  document.getElementById("editBtn").style.display = "block";
+  editBtn.style.display="block";
 }
 
-/* تفعيل التعديل */
-function enableEdit(){
-  document.getElementById("editArea").style.display = "block";
+/* طلب كلمة المرور */
+function askPassword(){
+  passwordBox.style.display="block";
 }
 
-/* تحديث الحالة */
+/* تحقق كلمة المرور */
+function checkPassword(){
+  if(password.value==="Admin"){
+    editArea.style.display="block";
+    passwordBox.style.display="none";
+  }else{
+    alert("❌ كلمة المرور خاطئة");
+  }
+}
+
+/* تحديث */
 async function updateStatus(){
-  const status = document.getElementById("newStatus").value;
-
   await fetch(API,{
     method:"POST",
     mode:"no-cors",
     body:JSON.stringify({
       update:true,
       row:currentRow,
-      status:status
+      status:newStatus.value
     })
   });
 
