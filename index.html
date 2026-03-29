@@ -7,197 +7,153 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-dark: #0f172a;
-            --card-dark: #1e293b;
-            --accent: #38bdf8;
-        }
         body { 
             font-family: 'Cairo', sans-serif; 
-            background-color: var(--bg-dark);
-            color: #f1f5f9;
-            margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px;
+            background-color: #0f172a; 
+            color: #f1f5f9; 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; margin: 0; padding: 15px;
         }
-        .main-container {
-            background: var(--card-dark);
-            border-radius: 28px;
-            border: 1px solid #334155;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            width: 100%; max-width: 420px; padding: 30px;
+        .card { 
+            background: #1e293b; border-radius: 24px; border: 1px solid #334155; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
+            width: 100%; max-width: 400px; padding: 30px; 
         }
-        .input-style {
-            background: #334155;
-            border: 1px solid #475569;
-            color: white;
-            border-radius: 14px;
-            padding: 14px; width: 100%; margin-bottom: 15px;
-            outline: none; transition: 0.3s ease;
+        .input-field { 
+            background: #334155; border: 1px solid #475569; color: white; 
+            border-radius: 12px; padding: 14px; width: 100%; margin-bottom: 15px; 
+            outline: none; transition: 0.3s; text-align: center;
         }
-        .input-style:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1); }
-        .btn-primary {
-            background: var(--accent);
-            color: #0f172a;
-            font-weight: 800;
-            padding: 16px; border-radius: 14px;
-            width: 100%; cursor: pointer; border: none; transition: 0.2s;
+        .input-field:focus { border-color: #38bdf8; }
+        .btn { 
+            background: #38bdf8; color: #0f172a; font-weight: bold; 
+            padding: 16px; border-radius: 12px; width: 100%; 
+            cursor: pointer; border: none; transition: 0.2s; 
         }
-        .btn-primary:active { transform: scale(0.96); }
+        .btn:active { transform: scale(0.97); }
         .hidden { display: none !important; }
-        .type-selector {
-            background: #334155; padding: 12px; border-radius: 12px;
-            flex: 1; text-align: center; cursor: pointer; border: 2px solid transparent;
-            transition: 0.3s; font-size: 14px; color: #94a3b8;
+        .type-pill { 
+            background: #334155; padding: 10px; border-radius: 10px; 
+            flex: 1; text-align: center; cursor: pointer; border: 2px solid transparent; 
         }
-        .active-type { border-color: var(--accent); background: #0f172a; color: white; font-weight: bold; }
+        .active-pill { border-color: #38bdf8; background: #0f172a; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="main-container">
+    <div class="card">
         <div id="step1">
-            <div class="text-center mb-8">
-                <h2 class="text-2xl font-bold text-sky-400">مرحباً بك</h2>
-                <p class="text-slate-400 text-sm mt-2">أدخل بريدك الإلكتروني لتلقي رمز الدخول</p>
-            </div>
-            <input type="email" id="uEmail" placeholder="example@gmail.com" class="input-style text-center">
-            <button onclick="sendOTP()" id="sendBtn" class="btn-primary">إرسال كود التحقق</button>
+            <h2 class="text-2xl font-bold text-center mb-6 text-sky-400">دخول العميل</h2>
+            <input type="email" id="uEmail" placeholder="your-email@example.com" class="input-field">
+            <button onclick="sendOTP()" id="sendBtn" class="btn">إرسال كود التحقق</button>
         </div>
 
-        <div id="step2" class="hidden text-center">
-            <h2 class="text-xl font-bold mb-2">تأكيد الرمز</h2>
-            <p class="text-slate-400 text-sm mb-6">أدخل الكود المكون من 4 أرقام المرسل لبريدك</p>
-            <input type="number" id="otpInp" placeholder="0 0 0 0" class="input-style text-center text-3xl tracking-[0.4em]">
-            <button onclick="verifyOTP()" class="btn-primary">تحقق ودخول</button>
-            <button onclick="location.reload()" class="mt-4 text-xs text-slate-500 underline">تغيير البريد</button>
+        <div id="step2" class="hidden">
+            <h2 class="text-xl font-bold text-center mb-4">أدخل الكود</h2>
+            <p class="text-slate-400 text-sm text-center mb-4">تفقد بريدك الإلكتروني الآن</p>
+            <input type="number" id="otpInp" placeholder="0 0 0 0" class="input-field text-2xl tracking-[0.5em]">
+            <button onclick="verifyOTP()" class="btn">تأكيد الرمز</button>
         </div>
 
         <div id="step3" class="hidden">
-            <div class="flex justify-between items-center mb-6">
-                <span id="mailBadge" class="bg-sky-500/10 text-sky-400 px-3 py-1 rounded-full text-xs font-bold"></span>
-                <span class="text-slate-500 text-xs italic">طلب جديد</span>
-            </div>
+            <h3 id="userMail" class="text-xs text-sky-400 mb-4 font-bold"></h3>
+            <input id="rName" type="text" placeholder="اسم المستلم" class="input-field text-right">
+            <input id="rPhone" type="tel" placeholder="رقم هاتف المستلم" class="input-field text-right">
             
-            <div class="space-y-1">
-                <input id="rName" type="text" placeholder="اسم المستلم" class="input-style">
-                <input id="rPhone" type="tel" placeholder="رقم الموبايل" class="input-style">
-                
-                <select id="gov" onchange="loadCities()" class="input-style">
-                    <option value="">اختر المحافظة</option>
-                </select>
-                <select id="city" class="input-style">
-                    <option value="">اختر المدينة</option>
-                </select>
+            <select id="gov" onchange="loadCities()" class="input-field text-right">
+                <option value="">اختر المحافظة</option>
+            </select>
+            <select id="city" class="input-field text-right">
+                <option value="">اختر المدينة</option>
+            </select>
 
-                <div class="flex gap-3 mb-6">
-                    <div id="t1" onclick="setType('شحن عادي', 't1')" class="type-selector active-type">شحن عادي</div>
-                    <div id="t2" onclick="setType('استبدال', 't2')" class="type-selector">استبدال</div>
-                </div>
-
-                <button onclick="submitOrder()" id="finalBtn" class="btn-primary">تأكيد الأوردر</button>
+            <div class="flex gap-2 mb-4">
+                <div id="t1" onclick="selectT('عادي', 't1')" class="type-pill active-pill">شحن عادي</div>
+                <div id="t2" onclick="selectT('استبدال', 't2')" class="type-pill">استبدال أوردر</div>
             </div>
+
+            <button onclick="finish()" id="finishBtn" class="btn">تأكيد الأوردر</button>
         </div>
     </div>
 
     <script>
-        // رابط الشيت الأول الخاص بك (المستقبل)
-        const API_URL = "https://script.google.com/macros/s/AKfycbzRSHo4OR9pA1rnFwJXUBZrthJOWLmAuOLyoP2oxMJtaXR-f4-Cc7k9Pffj9JbprzoPDg/exec";
+        // رابط الـ API الجديد الذي أرسلته
+        const API_URL = "https://script.google.com/macros/s/AKfycbzOm1XtbQemWZG6JToVPnIzfui3wQAF81bfCF8_iDHGcP64RcDvHpZplD3DMYH427fHlQ/exec";
         
-        let clientEmail = "", serverOTP = "", selectedType = "شحن عادي";
+        let clientMail = "", currentOTP = "", finalType = "عادي";
 
-        // قاعدة بيانات المحافظات والمدن
-        const egyptMap = {
-            "القاهرة": ["المعادي", "حلوان", "مدينة نصر", "مصر الجديدة", "وسط البلد", "التجمع الخامس", "شبرا"],
-            "الجيزة": ["الهرم", "الدقي", "6 أكتوبر", "الشيخ زايد", "فيصل", "العجوزة"],
-            "الإسكندرية": ["سموحة", "المنتزة", "محرم بك", "العجمي", "سيدي جابر", "ميامي"],
-            "البحيرة": ["دمنهور", "كفر الدوار", "إيتاي البارود", "كوم حمادة", "أبو حمص", "رشيد"],
-            "الغربية": ["طنطا", "المحلة الكبرى", "كفر الزيات", "بسيون"],
-            "الدقهلية": ["المنصورة", "طلخا", "ميت غمر", "السنبلاوين"],
-            "الشرقية": ["الزقازيق", "العاشر من رمضان", "بلبيس", "منيا القمح"],
-            "المنوفية": ["شبين الكوم", "قويسنا", "أشمون", "منوف"],
-            "القليوبية": ["بنها", "شبرا الخيمة", "العبور", "قليوب"],
-            "كفر الشيخ": ["كفر الشيخ", "دسوق", "فوه"],
-            "دمياط": ["دمياط", "دمياط الجديدة", "رأس البر"],
-            "الفيوم": ["الفيوم", "إطسا"],
-            "بني سويف": ["بني سويف", "الواسطى"],
-            "المنيا": ["المنيا", "ملوي", "مغاغة"],
-            "أسيوط": ["أسيوط", "ديروط"],
-            "سوهاج": ["سوهاج", "طما"],
-            "قنا": ["قنا", "نجع حمادي"],
-            "الأقصر": ["الأقصر", "إسنا"],
-            "أسوان": ["أسوان", "إدفو"],
-            "مطروح": ["مرسى مطروح", "العلمين"],
-            "البحر الأحمر": ["الغردقة", "سفاجا"],
-            "الإسماعيلية": ["الإسماعيلية", "فايد"]
+        const egypt = {
+            "القاهرة": ["المعادي", "التجمع", "مدينة نصر", "وسط البلد"],
+            "الجيزة": ["أكتوبر", "الشيخ زايد", "الهرم", "الدقي"],
+            "الإسكندرية": ["سموحة", "ميامي", "محرم بك"],
+            "البحيرة": ["دمنهور", "كفر الدوار", "كوم حمادة"]
         };
 
         window.onload = () => {
             const g = document.getElementById('gov');
-            Object.keys(egyptMap).sort().forEach(k => g.innerHTML += `<option value="${k}">${k}</option>`);
+            Object.keys(egypt).sort().forEach(k => g.innerHTML += `<option value="${k}">${k}</option>`);
         };
 
         function loadCities() {
             const g = document.getElementById('gov').value;
             const c = document.getElementById('city');
             c.innerHTML = '<option value="">اختر المدينة</option>';
-            if(egyptMap[g]) egyptMap[g].forEach(item => c.innerHTML += `<option value="${item}">${item}</option>`);
+            if(egypt[g]) egypt[g].forEach(item => c.innerHTML += `<option value="${item}">${item}</option>`);
         }
 
         function sendOTP() {
-            clientEmail = document.getElementById('uEmail').value;
-            if(!clientEmail.includes("@")) return alert("البريد الإلكتروني غير صحيح");
+            clientMail = document.getElementById('uEmail').value;
+            if(!clientMail.includes("@")) return alert("البريد غير صحيح");
             
-            serverOTP = Math.floor(1000 + Math.random() * 9000);
+            currentOTP = Math.floor(1000 + Math.random() * 9000);
             document.getElementById('sendBtn').innerText = "جاري الإرسال...";
             
             fetch(API_URL, {
                 method: "POST",
                 mode: "no-cors",
-                body: JSON.stringify({ action: "sendOTP", email: clientEmail, otp: serverOTP })
+                body: JSON.stringify({ action: "sendOTP", email: clientMail, otp: currentOTP })
             }).then(() => {
-                alert("تم إرسال كود التحقق لبريدك الإلكتروني.");
+                alert("تحقق من بريدك الإلكتروني الآن!");
                 document.getElementById('step1').classList.add('hidden');
                 document.getElementById('step2').classList.remove('hidden');
             });
         }
 
         function verifyOTP() {
-            if(document.getElementById('otpInp').value == serverOTP) {
+            if(document.getElementById('otpInp').value == currentOTP) {
                 document.getElementById('step2').classList.add('hidden');
                 document.getElementById('step3').classList.remove('hidden');
-                document.getElementById('mailBadge').innerText = clientEmail;
-            } else { alert("الكود غير صحيح!"); }
+                document.getElementById('userMail').innerText = clientMail;
+            } else { alert("الكود خطأ!"); }
         }
 
-        function setType(v, id) {
-            selectedType = v;
-            document.getElementById('t1').className = 'type-selector';
-            document.getElementById('t2').className = 'type-selector';
-            document.getElementById(id).classList.add('active-type');
+        function selectT(v, id) {
+            finalType = v;
+            document.getElementById('t1').classList.remove('active-pill');
+            document.getElementById('t2').classList.remove('active-pill');
+            document.getElementById(id).classList.add('active-pill');
         }
 
-        function submitOrder() {
-            const btn = document.getElementById('finalBtn');
-            btn.innerText = "جاري التأكيد..."; btn.disabled = true;
+        function finish() {
+            const btn = document.getElementById('finishBtn');
+            btn.innerText = "جاري الحفظ..."; btn.disabled = true;
             
-            const payload = {
-                email: clientEmail,
+            const data = {
+                email: clientMail,
                 name: document.getElementById('rName').value,
                 rPhone: document.getElementById('rPhone').value,
                 gov: document.getElementById('gov').value,
                 city: document.getElementById('city').value,
-                type: selectedType
+                type: finalType
             };
 
             fetch(API_URL, {
                 method: "POST",
                 mode: "no-cors",
-                body: JSON.stringify(payload)
+                body: JSON.stringify(data)
             }).then(() => {
-                alert("تم بنجاح! سيتم معالجة طلبك خلال لحظات.");
+                alert("تم تسجيل طلبك بنجاح!");
                 location.reload();
-            }).catch(() => {
-                alert("حدث خطأ، حاول مرة أخرى.");
-                btn.disabled = false;
             });
         }
     </script>
