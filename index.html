@@ -1,322 +1,205 @@
 <!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نظام الشحن الذكي</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    body { 
-      font-family: 'Cairo', sans-serif; 
-      background: linear-gradient(135deg, #f5f5f7 0%, #d2d2d7 100%);
-      min-height: 100vh;
-      margin: 0;
-    }
-    .ios-blur { 
-      background: rgba(255, 255, 255, 0.7); 
-      backdrop-filter: blur(20px); 
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: 24px; 
-      border: 1px solid rgba(255, 255, 255, 0.5);
-    }
-    .ios-input { 
-      border: 1px solid rgba(0,0,0,0.1); 
-      background: rgba(255, 255, 255, 0.9); 
-      border-radius: 14px; 
-      padding: 14px; 
-      width: 100%; 
-      outline: none;
-      transition: 0.3s;
-    }
-    .ios-input:focus {
-      border-color: #007aff;
-      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
-    }
-    .btn-apple { 
-      background: #007aff; 
-      color: white; 
-      border-radius: 14px; 
-      transition: 0.2s; 
-    }
-    .btn-apple:active { transform: scale(0.96); opacity: 0.9; }
-    .hidden { display: none !important; }
-    .radio-card { 
-      border: 2px solid transparent; 
-      cursor: pointer; 
-      transition: 0.3s; 
-      background: rgba(255, 255, 255, 0.6);
-    }
-    .radio-active { 
-      border-color: #007aff; 
-      background: #e5f1ff; 
-      font-weight: bold;
-    }
-    /* إخفاء شريط التمرير لمظهر نظيف مثل تطبيقات الجوال */
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام الشحن المحترف</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --card-dark: #1e1e1e;
+            --accent-blue: #0A84FF;
+            --text-main: #ffffff;
+            --text-dim: #a0a0a0;
+        }
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .dark-card {
+            background: var(--card-dark);
+            border-radius: 28px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .ios-input {
+            background: #2c2c2e;
+            border: 1px solid #3a3a3c;
+            color: white;
+            border-radius: 12px;
+            padding: 15px;
+            width: 100%;
+            outline: none;
+            transition: 0.3s;
+        }
+        .ios-input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15); }
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+            font-weight: 700;
+            border-radius: 12px;
+            padding: 16px;
+            transition: 0.3s;
+            width: 100%;
+        }
+        .btn-primary:active { transform: scale(0.98); }
+        .hidden { display: none !important; }
+        .type-card {
+            background: #2c2c2e;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            flex: 1;
+        }
+        .type-active { border-color: var(--accent-blue); background: rgba(10, 132, 255, 0.1); }
+    </style>
 </head>
-<body class="p-4 flex justify-center items-center">
+<body class="p-4">
 
-  <div id="app" class="w-full max-w-md ios-blur shadow-2xl p-6">
-    
-    <div id="loginPage">
-      <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">مرحباً بك</h1>
-        <p class="text-gray-500">سجل الدخول برقم هاتفك للمتابعة</p>
-      </div>
-      <input type="tel" id="userPhone" placeholder="رقم الهاتف (مثال: 010...)" class="ios-input mb-4 text-center text-lg" dir="ltr">
-      <button onclick="sendCode()" class="w-full btn-apple py-4 font-bold text-lg">إرسال كود التحقق</button>
-    </div>
-
-    <div id="otpPage" class="hidden">
-      <h2 class="text-2xl font-bold text-center mb-4">التحقق</h2>
-      <p class="text-center text-gray-500 mb-6">أدخل الكود المرسل إليك</p>
-      <input type="number" id="otpCode" placeholder="0 0 0 0" class="ios-input mb-6 text-center text-3xl tracking-[1em]" dir="ltr">
-      <button onclick="verifyCode()" class="w-full btn-apple py-4 font-bold text-lg">تأكيد الدخول</button>
-    </div>
-
-    <div id="dashboard" class="hidden relative min-h-[60vh]">
-      <h2 class="text-2xl font-bold text-center mb-6">طلباتي</h2>
-      
-      <div id="trackingArea" class="bg-white/80 p-5 rounded-2xl shadow-sm border border-gray-100 mb-6 hidden">
-         <div class="flex justify-between items-center mb-3">
-           <span class="font-bold text-gray-700">حالة الشحنة:</span>
-           <span id="statusLabel" class="text-sm px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full font-bold">قيد المراجعة</span>
-         </div>
-         <button id="trackBtn" onclick="trackOrder()" class="w-full bg-green-500 text-white py-3 rounded-xl font-bold hidden mt-2">تتبع الشحنة الآن</button>
-      </div>
-
-      <div class="absolute bottom-4 left-0 right-0 flex flex-col items-center">
-        <button onclick="openForm()" class="w-16 h-16 bg-blue-600 text-white rounded-full shadow-xl text-4xl hover:bg-blue-700 transition flex items-center justify-center mb-2">+</button>
-        <p class="text-gray-500 text-sm font-semibold">تسجيل شحنة جديدة</p>
-      </div>
-    </div>
-
-    <div id="shipmentForm" class="hidden flex flex-col h-[80vh]">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold">شحنة جديدة</h2>
-        <button onclick="backToDashboard()" class="text-blue-500 font-bold">إلغاء</button>
-      </div>
-      
-      <div class="space-y-4 overflow-y-auto no-scrollbar pb-4 flex-1 pr-1">
-        <input id="resName" type="text" placeholder="اسم المستلم" class="ios-input">
-        <input id="resPhone1" type="tel" placeholder="رقم هاتف المستلم الأول" class="ios-input" dir="ltr">
-        <input id="resPhone2" type="tel" placeholder="رقم هاتف آخر (اختياري)" class="ios-input" dir="ltr">
+    <div id="app" class="w-full max-w-md dark-card p-8">
         
-        <select id="gov" onchange="loadCities()" class="ios-input bg-white">
-          <option value="">اختر المحافظة</option>
-          </select>
-
-        <select id="city" class="ios-input bg-white">
-          <option value="">اختر المدينة أولاً</option>
-        </select>
-        
-        <input id="area" type="text" placeholder="منطقة الوصول" class="ios-input">
-        <input id="street" type="text" placeholder="شارع المستلم بالتفصيل" class="ios-input">
-        
-        <div class="flex gap-3">
-          <input id="weight" type="number" placeholder="الوزن (أقصى 30كجم)" class="ios-input w-1/2 text-center text-sm">
-          <input id="amount" type="number" placeholder="المبلغ المطلوب (ج.م)" class="ios-input w-1/2 text-center text-sm">
+        <div id="loginSection">
+            <h1 class="text-3xl font-bold mb-2 text-center">تسجيل الدخول</h1>
+            <p class="text-center text-gray-400 mb-8">أدخل رقم هاتفك لاستلام كود التحقق</p>
+            <input type="tel" id="uPhone" placeholder="01xxxxxxxxx" class="ios-input mb-4 text-center text-xl">
+            <button onclick="requestOTP()" id="otpBtn" class="btn-primary">إرسال كود التحقق</button>
         </div>
-        
-        <p class="text-sm font-bold text-gray-600 mt-2">نوع الشحن:</p>
-        <div class="flex gap-3 mb-4">
-          <div id="type1" onclick="selectType('تسليم طبيعي', 'type1')" class="radio-card flex-1 p-3 rounded-xl text-center text-sm">تسليم طبيعي</div>
-          <div id="type2" onclick="selectType('استبدال', 'type2')" class="radio-card flex-1 p-3 rounded-xl text-center text-sm">استبدال</div>
+
+        <div id="verifySection" class="hidden text-center">
+            <h1 class="text-2xl font-bold mb-6">أدخل الكود</h1>
+            <div class="flex justify-center gap-2 mb-8" dir="ltr">
+                <input type="number" id="vCode" placeholder="••••" class="ios-input text-center text-2xl tracking-widest w-40">
+            </div>
+            <button onclick="verifyOTP()" class="btn-primary">تحقق ودخول</button>
         </div>
-      </div>
-      
-      <button id="submitBtn" onclick="submitData()" class="w-full btn-apple py-4 mt-2 font-bold text-lg shadow-lg">تأكيد التسجيل</button>
+
+        <div id="formSection" class="hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">بيانات الشحنة</h2>
+                <span class="text-blue-400 text-sm" id="userDisplay"></span>
+            </div>
+            
+            <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2" id="scrollArea">
+                <input id="rName" type="text" placeholder="اسم المستلم" class="ios-input">
+                <input id="rPhone" type="tel" placeholder="رقم المستلم" class="ios-input">
+                
+                <select id="govSelect" onchange="updateCities()" class="ios-input">
+                    <option value="">اختر المحافظة</option>
+                </select>
+
+                <select id="citySelect" class="ios-input">
+                    <option value="">اختر المدينة</option>
+                </select>
+
+                <input id="address" type="text" placeholder="العنوان بالتفصيل" class="ios-input">
+                
+                <div class="flex gap-2">
+                    <input id="weight" type="number" placeholder="الوزن" class="ios-input">
+                    <input id="price" type="number" placeholder="السعر" class="ios-input">
+                </div>
+
+                <div class="flex gap-3">
+                    <div id="t1" onclick="setType('عادي', 't1')" class="type-card">شحن عادي</div>
+                    <div id="t2" onclick="setType('استبدال', 't2')" class="type-card">استبدال</div>
+                </div>
+            </div>
+            
+            <button onclick="sendToSheet()" id="sendBtn" class="btn-primary mt-6">تأكيد الأوردر</button>
+        </div>
+
     </div>
 
-  </div>
+    <script>
+        // بيانات المحافظات والمدن (مدمجة للسرعة القصوى)
+        const data = {
+            "القاهرة": ["المعادي", "حلوان", "مدينة نصر", "مصر الجديدة"],
+            "الجيزة": ["الهرم", "الدقي", "أكتوبر", "الشيخ زايد"],
+            "الإسكندرية": ["سموحة", "المنتزة", "محرم بك"],
+            "البحيرة": ["دمنهور", "كفر الدوار", "كوم حمادة"]
+            // يمكنك إضافة الباقي هنا بنفس النمط
+        };
 
-  <script>
-    let selectedType = "";
-    let currentUserPhone = "";
+        let currentType = "";
+        let generatedOTP = "";
+        const scriptURL = "رابط_API_الشيت_الأول_هنا"; // ضع رابط Web App الخاص بشيت 1
 
-    // 1. عند تحميل الصفحة، نملأ قائمة المحافظات تلقائياً
-    window.onload = function() {
-      const govSelect = document.getElementById('gov');
-      const provinces = [
-        "القاهرة", "الجيزة", "الإسكندرية", "القليوبية", "الدقهلية", "الشرقية", 
-        "المنوفية", "الغربية", "البحيرة", "كفر الشيخ", "دمياط", "بورسعيد", 
-        "الإسماعيلية", "السويس", "الفيوم", "بني سويف", "المنيا", "أسيوط", 
-        "سوهاج", "قنا", "الأقصر", "أسوان", "البحر الأحمر", "الوادي الجديد", 
-        "مطروح", "شمال سيناء", "جنوب سيناء"
-      ];
-      
-      provinces.forEach(gov => {
-        let opt = document.createElement('option');
-        opt.value = gov;
-        opt.innerHTML = gov;
-        govSelect.appendChild(opt);
-      });
-    };
+        window.onload = () => {
+            const govS = document.getElementById('govSelect');
+            Object.keys(data).forEach(g => govS.innerHTML += `<option value="${g}">${g}</option>`);
+        };
 
-    // 2. دوال التنقل وتسجيل الدخول
-    function sendCode() {
-      const phone = document.getElementById('userPhone').value;
-      if(phone.length >= 10) {
-        currentUserPhone = phone;
-        document.getElementById('loginPage').classList.add('hidden');
-        document.getElementById('otpPage').classList.remove('hidden');
-      } else {
-        alert("يرجى إدخال رقم هاتف صحيح");
-      }
-    }
-
-    function verifyCode() {
-      const code = document.getElementById('otpCode').value;
-      if(code) { 
-        document.getElementById('otpPage').classList.add('hidden');
-        document.getElementById('dashboard').classList.remove('hidden');
-        checkCurrentStatus(); // فحص حالة الشحنات فور الدخول
-      }
-    }
-
-    function openForm() {
-      document.getElementById('dashboard').classList.add('hidden');
-      document.getElementById('shipmentForm').classList.remove('hidden');
-    }
-
-    function backToDashboard() {
-      document.getElementById('shipmentForm').classList.add('hidden');
-      document.getElementById('dashboard').classList.remove('hidden');
-    }
-
-    // 3. جلب المدن من السيرفر بناءً على المحافظة
-    function loadCities() {
-      const gov = document.getElementById('gov').value;
-      const citySelect = document.getElementById('city');
-      
-      if(!gov) {
-        citySelect.innerHTML = '<option value="">اختر المدينة</option>';
-        return;
-      }
-
-      citySelect.innerHTML = '<option value="">جاري التحميل...</option>';
-
-      google.script.run.withSuccessHandler(function(cities) {
-        let html = '<option value="">اختر المدينة</option>';
-        if(cities && cities.length > 0) {
-          cities.forEach(c => html += `<option value="${c}">${c}</option>`);
-        } else {
-          html = '<option value="">لا توجد مدن مسجلة</option>';
+        function updateCities() {
+            const g = document.getElementById('govSelect').value;
+            const cS = document.getElementById('citySelect');
+            cS.innerHTML = '<option value="">اختر المدينة</option>';
+            if(data[g]) data[g].forEach(c => cS.innerHTML += `<option value="${c}">${c}</option>`);
         }
-        citySelect.innerHTML = html;
-      }).getCities(gov);
-    }
 
-    // 4. اختيار نوع الشحن (استبدال / طبيعي)
-    function selectType(val, id) {
-      selectedType = val;
-      document.getElementById('type1').classList.remove('radio-active');
-      document.getElementById('type2').classList.remove('radio-active');
-      document.getElementById(id).classList.add('radio-active');
-    }
-
-    // 5. إرسال البيانات
-    function submitData() {
-      const name = document.getElementById('resName').value;
-      const phone = document.getElementById('resPhone1').value;
-      const gov = document.getElementById('gov').value;
-      const city = document.getElementById('city').value;
-      const weight = document.getElementById('weight').value;
-
-      if(!name || !phone || !gov || !city || !selectedType) {
-        alert("يرجى ملء كافة الحقول الأساسية واختيار نوع الشحن");
-        return;
-      }
-      
-      // شرط ألا يتجاوز الوزن 30 كجم
-      if(weight > 30) {
-        alert("عذراً، أقصى وزن مسموح به هو 30 كجم");
-        return;
-      }
-
-      const btn = document.getElementById('submitBtn');
-      btn.innerText = "جاري التسجيل...";
-      btn.disabled = true;
-
-      const formData = {
-        userPhone: currentUserPhone,
-        receiverName: name,
-        receiverPhone1: phone,
-        receiverPhone2: document.getElementById('resPhone2').value,
-        gov: gov,
-        city: city,
-        area: document.getElementById('area').value,
-        street: document.getElementById('street').value,
-        weight: weight,
-        amount: document.getElementById('amount').value,
-        shippingType: selectedType
-      };
-
-      google.script.run.withSuccessHandler(function(response) {
-        alert("تم تسجيل الشحنة بنجاح! طلبك الآن قيد المراجعة.");
-        
-        // تفريغ الفورم للطلب القادم
-        document.getElementById('resName').value = "";
-        document.getElementById('resPhone1').value = "";
-        document.getElementById('resPhone2').value = "";
-        document.getElementById('area').value = "";
-        document.getElementById('street').value = "";
-        document.getElementById('weight').value = "";
-        document.getElementById('amount').value = "";
-        selectedType = "";
-        document.getElementById('type1').classList.remove('radio-active');
-        document.getElementById('type2').classList.remove('radio-active');
-        
-        btn.innerText = "تأكيد التسجيل";
-        btn.disabled = false;
-        
-        backToDashboard();
-        checkCurrentStatus(); // تحديث اللوحة ليظهر "قيد المراجعة"
-        
-      }).withFailureHandler(function(error) {
-        alert("حدث خطأ أثناء التسجيل: " + error);
-        btn.innerText = "تأكيد التسجيل";
-        btn.disabled = false;
-      }).saveShipment(formData);
-    }
-
-    // 6. التحقق من وجود كود شحن لإظهار الزر الأخضر
-    function checkCurrentStatus() {
-      if(!currentUserPhone) return;
-      
-      google.script.run.withSuccessHandler(function(res) {
-        if(res) {
-          const trackingArea = document.getElementById('trackingArea');
-          const statusLabel = document.getElementById('statusLabel');
-          const trackBtn = document.getElementById('trackBtn');
-          
-          trackingArea.classList.remove('hidden');
-          
-          if(res.trackingCode && res.trackingCode !== "") {
-            statusLabel.innerText = "تم قبول الشحنة";
-            statusLabel.className = "text-sm px-3 py-1 bg-green-100 text-green-700 rounded-full font-bold";
-            trackBtn.classList.remove('hidden');
-            trackBtn.setAttribute('data-code', res.trackingCode);
-          } else {
-            statusLabel.innerText = "قيد المراجعة";
-            statusLabel.className = "text-sm px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full font-bold";
-            trackBtn.classList.add('hidden');
-          }
+        function setType(val, id) {
+            currentType = val;
+            document.getElementById('t1').className = 'type-card';
+            document.getElementById('t2').className = 'type-card';
+            document.getElementById(id).classList.add('type-active');
         }
-      }).checkShipmentStatus(currentUserPhone);
-    }
 
-    // 7. دالة تتبع الشحنة
-    function trackOrder() {
-      const code = document.getElementById('trackBtn').getAttribute('data-code');
-      if(code) {
-        // سيتم ربط الـ API هنا، مؤقتاً نعرض رسالة برقم الشحنة
-        alert("جاري الاتصال بشركة الشحن لتتبع الشحنة رقم: " + code);
-      }
-    }
-  </script>
+        // نظام OTP
+        function requestOTP() {
+            const p = document.getElementById('uPhone').value;
+            if(p.length < 10) return alert("رقم خطأ");
+            
+            // توليد كود وهمي حالياً (يمكن ربطه بـ Twilio لاحقاً)
+            generatedOTP = Math.floor(1000 + Math.random() * 9000);
+            alert("كود التحقق الخاص بك هو: " + generatedOTP); // محاكاة للإرسال
+            
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('verifySection').classList.remove('hidden');
+        }
+
+        function verifyOTP() {
+            if(document.getElementById('vCode').value == generatedOTP) {
+                document.getElementById('verifySection').classList.add('hidden');
+                document.getElementById('formSection').classList.remove('hidden');
+                document.getElementById('userDisplay').innerText = document.getElementById('uPhone').value;
+            } else {
+                alert("كود خاطئ");
+            }
+        }
+
+        function sendToSheet() {
+            const btn = document.getElementById('sendBtn');
+            btn.innerText = "جاري الإرسال...";
+            btn.disabled = true;
+
+            const payload = {
+                phone: document.getElementById('uPhone').value,
+                name: document.getElementById('rName').value,
+                rPhone: document.getElementById('rPhone').value,
+                gov: document.getElementById('govSelect').value,
+                city: document.getElementById('citySelect').value,
+                type: currentType
+            };
+
+            // إرسال البيانات باستخدام Fetch (متوافق مع GitHub)
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors', // لتجنب مشاكل الـ CORS
+                cache: 'no-cache',
+                body: JSON.stringify(payload)
+            }).then(() => {
+                alert("تم التسجيل بنجاح!");
+                location.reload();
+            }).catch(e => alert("خطأ: " + e));
+        }
+    </script>
 </body>
 </html>
