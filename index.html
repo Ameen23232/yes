@@ -7,152 +7,109 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Cairo', sans-serif; 
-            background-color: #0f172a; 
-            color: #f1f5f9; 
-            display: flex; justify-content: center; align-items: center; 
-            min-height: 100vh; margin: 0; padding: 15px;
-        }
-        .card { 
-            background: #1e293b; border-radius: 24px; border: 1px solid #334155; 
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
-            width: 100%; max-width: 400px; padding: 30px; 
-        }
-        .input-field { 
-            background: #334155; border: 1px solid #475569; color: white; 
-            border-radius: 12px; padding: 14px; width: 100%; margin-bottom: 15px; 
-            outline: none; transition: 0.3s; text-align: center;
-        }
-        .input-field:focus { border-color: #38bdf8; }
-        .btn { 
-            background: #38bdf8; color: #0f172a; font-weight: bold; 
-            padding: 16px; border-radius: 12px; width: 100%; 
-            cursor: pointer; border: none; transition: 0.2s; 
-        }
-        .btn:active { transform: scale(0.97); }
+        body { font-family: 'Cairo', sans-serif; background-color: #0f172a; color: #f1f5f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; }
+        .card { background: #1e293b; border-radius: 24px; border: 1px solid #334155; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 100%; max-width: 400px; padding: 30px; }
+        .input-style { background: #334155; border: 1px solid #475569; color: white; border-radius: 12px; padding: 14px; width: 100%; margin-bottom: 15px; outline: none; transition: 0.3s; text-align: center; }
+        .btn { background: #38bdf8; color: #0f172a; font-weight: bold; padding: 16px; border-radius: 12px; width: 100%; cursor: pointer; border: none; transition: 0.2s; }
+        .btn:disabled { background: #475569; cursor: not-allowed; }
         .hidden { display: none !important; }
-        .type-pill { 
-            background: #334155; padding: 10px; border-radius: 10px; 
-            flex: 1; text-align: center; cursor: pointer; border: 2px solid transparent; 
-        }
-        .active-pill { border-color: #38bdf8; background: #0f172a; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="card">
         <div id="step1">
-            <h2 class="text-2xl font-bold text-center mb-6 text-sky-400">دخول العميل</h2>
-            <input type="email" id="uEmail" placeholder="your-email@example.com" class="input-field">
+            <h2 class="text-2xl font-bold text-center mb-6 text-sky-400">تسجيل الدخول</h2>
+            <input type="email" id="uEmail" placeholder="بريدك الإلكتروني" class="input-style">
             <button onclick="sendOTP()" id="sendBtn" class="btn">إرسال كود التحقق</button>
         </div>
 
         <div id="step2" class="hidden">
-            <h2 class="text-xl font-bold text-center mb-4">أدخل الكود</h2>
-            <p class="text-slate-400 text-sm text-center mb-4">تفقد بريدك الإلكتروني الآن</p>
-            <input type="number" id="otpInp" placeholder="0 0 0 0" class="input-field text-2xl tracking-[0.5em]">
-            <button onclick="verifyOTP()" class="btn">تأكيد الرمز</button>
+            <h2 class="text-xl font-bold text-center mb-4">أدخل الرمز</h2>
+            <p class="text-slate-400 text-sm text-center mb-4">تفقد بريدك الإلكتروني (بما في ذلك الـ Spam)</p>
+            <input type="number" id="otpInp" placeholder="0 0 0 0" class="input-style text-2xl tracking-[0.5em]">
+            <button onclick="verifyOTP()" class="btn">دخول</button>
         </div>
 
         <div id="step3" class="hidden">
-            <h3 id="userMail" class="text-xs text-sky-400 mb-4 font-bold"></h3>
-            <input id="rName" type="text" placeholder="اسم المستلم" class="input-field text-right">
-            <input id="rPhone" type="tel" placeholder="رقم هاتف المستلم" class="input-field text-right">
-            
-            <select id="gov" onchange="loadCities()" class="input-field text-right">
-                <option value="">اختر المحافظة</option>
-            </select>
-            <select id="city" class="input-field text-right">
-                <option value="">اختر المدينة</option>
-            </select>
-
-            <div class="flex gap-2 mb-4">
-                <div id="t1" onclick="selectT('عادي', 't1')" class="type-pill active-pill">شحن عادي</div>
-                <div id="t2" onclick="selectT('استبدال', 't2')" class="type-pill">استبدال أوردر</div>
-            </div>
-
-            <button onclick="finish()" id="finishBtn" class="btn">تأكيد الأوردر</button>
+            <p class="text-xs text-sky-400 mb-4" id="loggedUser"></p>
+            <input id="rName" type="text" placeholder="اسم المستلم" class="input-style">
+            <input id="rPhone" type="tel" placeholder="رقم هاتف المستلم" class="input-style">
+            <button onclick="submitFinalOrder()" id="finalBtn" class="btn">تأكيد الأوردر</button>
         </div>
     </div>
 
     <script>
-        // رابط الـ API الجديد الذي أرسلته
-        const API_URL = "https://script.google.com/macros/s/AKfycbzOm1XtbQemWZG6JToVPnIzfui3wQAF81bfCF8_iDHGcP64RcDvHpZplD3DMYH427fHlQ/exec";
-        
-        let clientMail = "", currentOTP = "", finalType = "عادي";
+        // رابط Formspree الخاص بك
+        const FORMSPREE_URL = "https://formspree.io/f/mbdpgong";
+        // رابط الشيت الأول الخاص بك (لحفظ البيانات)
+        const SHEET_URL = "https://script.google.com/macros/s/AKfycbzOm1XtbQemWZG6JToVPnIzfui3wQAF81bfCF8_iDHGcP64RcDvHpZplD3DMYH427fHlQ/exec";
 
-        const egypt = {
-            "القاهرة": ["المعادي", "التجمع", "مدينة نصر", "وسط البلد"],
-            "الجيزة": ["أكتوبر", "الشيخ زايد", "الهرم", "الدقي"],
-            "الإسكندرية": ["سموحة", "ميامي", "محرم بك"],
-            "البحيرة": ["دمنهور", "كفر الدوار", "كوم حمادة"]
-        };
+        let userMail = "", generatedOTP = "";
 
-        window.onload = () => {
-            const g = document.getElementById('gov');
-            Object.keys(egypt).sort().forEach(k => g.innerHTML += `<option value="${k}">${k}</option>`);
-        };
+        async function sendOTP() {
+            userMail = document.getElementById('uEmail').value;
+            if(!userMail.includes("@")) return alert("يرجى إدخال إيميل صحيح");
 
-        function loadCities() {
-            const g = document.getElementById('gov').value;
-            const c = document.getElementById('city');
-            c.innerHTML = '<option value="">اختر المدينة</option>';
-            if(egypt[g]) egypt[g].forEach(item => c.innerHTML += `<option value="${item}">${item}</option>`);
-        }
+            generatedOTP = Math.floor(1000 + Math.random() * 9000);
+            const btn = document.getElementById('sendBtn');
+            btn.innerText = "جاري الإرسال...";
+            btn.disabled = true;
 
-        function sendOTP() {
-            clientMail = document.getElementById('uEmail').value;
-            if(!clientMail.includes("@")) return alert("البريد غير صحيح");
-            
-            currentOTP = Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('sendBtn').innerText = "جاري الإرسال...";
-            
-            fetch(API_URL, {
-                method: "POST",
-                mode: "no-cors",
-                body: JSON.stringify({ action: "sendOTP", email: clientMail, otp: currentOTP })
-            }).then(() => {
-                alert("تحقق من بريدك الإلكتروني الآن!");
-                document.getElementById('step1').classList.add('hidden');
-                document.getElementById('step2').classList.remove('hidden');
-            });
+            // إرسال الكود عبر Formspree
+            try {
+                const response = await fetch(FORMSPREE_URL, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: userMail,
+                        message: `كود التحقق الخاص بك للدخول هو: ${generatedOTP}`
+                    })
+                });
+
+                if (response.ok) {
+                    alert("تم إرسال الكود! تفقد إيميلك الآن.");
+                    document.getElementById('step1').classList.add('hidden');
+                    document.getElementById('step2').classList.remove('hidden');
+                } else {
+                    alert("خطأ في الخدمة، حاول لاحقاً.");
+                    btn.disabled = false;
+                    btn.innerText = "إرسال كود التحقق";
+                }
+            } catch (err) {
+                alert("حدث خطأ في الاتصال.");
+                btn.disabled = false;
+            }
         }
 
         function verifyOTP() {
-            if(document.getElementById('otpInp').value == currentOTP) {
+            const input = document.getElementById('otpInp').value;
+            if(input == generatedOTP) {
                 document.getElementById('step2').classList.add('hidden');
                 document.getElementById('step3').classList.remove('hidden');
-                document.getElementById('userMail').innerText = clientMail;
-            } else { alert("الكود خطأ!"); }
+                document.getElementById('loggedUser').innerText = "مسجل بـ: " + userMail;
+            } else {
+                alert("الكود غير صحيح!");
+            }
         }
 
-        function selectT(v, id) {
-            finalType = v;
-            document.getElementById('t1').classList.remove('active-pill');
-            document.getElementById('t2').classList.remove('active-pill');
-            document.getElementById(id).classList.add('active-pill');
-        }
-
-        function finish() {
-            const btn = document.getElementById('finishBtn');
+        async function submitFinalOrder() {
+            const btn = document.getElementById('finalBtn');
             btn.innerText = "جاري الحفظ..."; btn.disabled = true;
-            
+
             const data = {
-                email: clientMail,
+                email: userMail,
                 name: document.getElementById('rName').value,
                 rPhone: document.getElementById('rPhone').value,
-                gov: document.getElementById('gov').value,
-                city: document.getElementById('city').value,
-                type: finalType
+                action: "saveOrder" // لتمييز الطلب في الشيت
             };
 
-            fetch(API_URL, {
+            fetch(SHEET_URL, {
                 method: "POST",
                 mode: "no-cors",
                 body: JSON.stringify(data)
             }).then(() => {
-                alert("تم تسجيل طلبك بنجاح!");
+                alert("تم تسجيل الأوردر بنجاح!");
                 location.reload();
             });
         }
