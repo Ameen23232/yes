@@ -3,202 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام الشحن المحترف</title>
+    <title>لوحة تحكم الشحن الذكية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #121212;
-            --card-dark: #1e1e1e;
-            --accent-blue: #0A84FF;
-            --text-main: #ffffff;
-            --text-dim: #a0a0a0;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #38bdf8;
+            --text-p: #e2e8f0;
+            --text-s: #94a3b8;
         }
         body { 
             font-family: 'Cairo', sans-serif; 
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            background-color: var(--bg);
+            color: var(--text-p);
+            margin: 0; padding: 20px;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
-        .dark-card {
-            background: var(--card-dark);
-            border-radius: 28px;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        .ios-card {
+            background: var(--card);
+            border-radius: 24px;
+            border: 1px solid #334155;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 100%; max-width: 420px; padding: 30px;
         }
-        .ios-input {
-            background: #2c2c2e;
-            border: 1px solid #3a3a3c;
+        .input-field {
+            background: #334155;
+            border: 1px solid #475569;
             color: white;
-            border-radius: 12px;
-            padding: 15px;
-            width: 100%;
-            outline: none;
-            transition: 0.3s;
+            border-radius: 14px;
+            padding: 14px; width: 100%; margin-bottom: 15px;
+            outline: none; transition: 0.3s ease;
         }
-        .ios-input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15); }
-        .btn-primary {
-            background: var(--accent-blue);
-            color: white;
-            font-weight: 700;
-            border-radius: 12px;
-            padding: 16px;
-            transition: 0.3s;
-            width: 100%;
-        }
-        .btn-primary:active { transform: scale(0.98); }
-        .hidden { display: none !important; }
-        .type-card {
-            background: #2c2c2e;
-            border: 2px solid transparent;
-            border-radius: 12px;
-            padding: 12px;
-            text-align: center;
+        .input-field:focus { border-color: var(--accent); ring: 2px var(--accent); }
+        .btn-main {
+            background: var(--accent);
+            color: #0f172a;
+            font-weight: 800;
+            padding: 16px; border-radius: 14px;
+            width: 100%; transition: 0.2s;
             cursor: pointer;
-            flex: 1;
         }
-        .type-active { border-color: var(--accent-blue); background: rgba(10, 132, 255, 0.1); }
+        .btn-main:active { transform: scale(0.97); }
+        .hidden { display: none !important; }
+        .type-pill {
+            background: #334155; padding: 12px; border-radius: 12px;
+            flex: 1; text-align: center; cursor: pointer; border: 2px solid transparent;
+            transition: 0.3s; color: var(--text-s);
+        }
+        .active-pill { border-color: var(--accent); background: #0f172a; color: white; font-weight: bold; }
+        
+        /* تحسين مظهر التمرير */
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
     </style>
 </head>
-<body class="p-4">
+<body>
 
-    <div id="app" class="w-full max-w-md dark-card p-8">
-        
-        <div id="loginSection">
-            <h1 class="text-3xl font-bold mb-2 text-center">تسجيل الدخول</h1>
-            <p class="text-center text-gray-400 mb-8">أدخل رقم هاتفك لاستلام كود التحقق</p>
-            <input type="tel" id="uPhone" placeholder="01xxxxxxxxx" class="ios-input mb-4 text-center text-xl">
-            <button onclick="requestOTP()" id="otpBtn" class="btn-primary">إرسال كود التحقق</button>
-        </div>
-
-        <div id="verifySection" class="hidden text-center">
-            <h1 class="text-2xl font-bold mb-6">أدخل الكود</h1>
-            <div class="flex justify-center gap-2 mb-8" dir="ltr">
-                <input type="number" id="vCode" placeholder="••••" class="ios-input text-center text-2xl tracking-widest w-40">
+    <div class="ios-card">
+        <div id="loginStep">
+            <div class="text-center mb-8">
+                <div class="inline-block p-4 bg-sky-500/10 rounded-full mb-4">
+                    <svg class="w-8 h-8 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <h2 class="text-2xl font-bold">تسجيل الدخول</h2>
+                <p class="text-slate-400 text-sm mt-1">أدخل رقم هاتفك لتأكيد هويتك</p>
             </div>
-            <button onclick="verifyOTP()" class="btn-primary">تحقق ودخول</button>
+            <input type="tel" id="uPhone" placeholder="01xxxxxxxxx" class="input-field text-center text-xl tracking-wider">
+            <button onclick="sendOTP()" id="otpBtn" class="btn-main">إرسال كود التحقق</button>
         </div>
 
-        <div id="formSection" class="hidden">
+        <div id="verifyStep" class="hidden text-center">
+            <h2 class="text-xl font-bold mb-2">رمز التحقق</h2>
+            <p class="text-slate-400 text-sm mb-6">أدخل الكود المكون من 4 أرقام</p>
+            <input type="number" id="otpInp" placeholder="0 0 0 0" class="input-field text-center text-3xl tracking-[0.5em]">
+            <button onclick="confirmOTP()" class="btn-main">دخول</button>
+            <button onclick="location.reload()" class="mt-4 text-sm text-slate-500 underline">تغيير الرقم</button>
+        </div>
+
+        <div id="formStep" class="hidden">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold">بيانات الشحنة</h2>
-                <span class="text-blue-400 text-sm" id="userDisplay"></span>
+                <h3 class="text-lg font-bold text-sky-400">طلب شحن جديد</h3>
+                <span id="userBadge" class="bg-sky-500/10 text-sky-400 px-3 py-1 rounded-full text-xs"></span>
             </div>
             
-            <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2" id="scrollArea">
-                <input id="rName" type="text" placeholder="اسم المستلم" class="ios-input">
-                <input id="rPhone" type="tel" placeholder="رقم المستلم" class="ios-input">
+            <div class="custom-scroll space-y-2 max-h-[400px] overflow-y-auto px-1">
+                <label class="text-xs text-slate-500 mr-2">بيانات المستلم</label>
+                <input id="rName" type="text" placeholder="اسم المستلم بالكامل" class="input-field">
+                <input id="rPhone" type="tel" placeholder="رقم هاتف المستلم" class="input-field">
                 
-                <select id="govSelect" onchange="updateCities()" class="ios-input">
+                <label class="text-xs text-slate-500 mr-2">العنوان</label>
+                <select id="gov" onchange="loadCities()" class="input-field">
                     <option value="">اختر المحافظة</option>
                 </select>
-
-                <select id="citySelect" class="ios-input">
+                <select id="city" class="input-field">
                     <option value="">اختر المدينة</option>
                 </select>
-
-                <input id="address" type="text" placeholder="العنوان بالتفصيل" class="ios-input">
                 
-                <div class="flex gap-2">
-                    <input id="weight" type="number" placeholder="الوزن" class="ios-input">
-                    <input id="price" type="number" placeholder="السعر" class="ios-input">
-                </div>
-
-                <div class="flex gap-3">
-                    <div id="t1" onclick="setType('عادي', 't1')" class="type-card">شحن عادي</div>
-                    <div id="t2" onclick="setType('استبدال', 't2')" class="type-card">استبدال</div>
+                <input id="address" type="text" placeholder="العنوان بالتفصيل (شارع/عمارة)" class="input-field">
+                
+                <label class="text-xs text-slate-500 mr-2">نوع الخدمة</label>
+                <div class="flex gap-3 mb-4">
+                    <div id="t1" onclick="pickType('تسليم طبيعي', 't1')" class="type-pill active-pill">تسليم</div>
+                    <div id="t2" onclick="pickType('استبدال', 't2')" class="type-pill">استبدال</div>
                 </div>
             </div>
-            
-            <button onclick="sendToSheet()" id="sendBtn" class="btn-primary mt-6">تأكيد الأوردر</button>
-        </div>
 
+            <button onclick="finalizeOrder()" id="finalBtn" class="btn-main mt-4">تأكيد الأوردر الآن</button>
+        </div>
     </div>
 
     <script>
-        // بيانات المحافظات والمدن (مدمجة للسرعة القصوى)
-        const data = {
-            "القاهرة": ["المعادي", "حلوان", "مدينة نصر", "مصر الجديدة"],
-            "الجيزة": ["الهرم", "الدقي", "أكتوبر", "الشيخ زايد"],
-            "الإسكندرية": ["سموحة", "المنتزة", "محرم بك"],
-            "البحيرة": ["دمنهور", "كفر الدوار", "كوم حمادة"]
-            // يمكنك إضافة الباقي هنا بنفس النمط
-        };
-
-        let currentType = "";
+        // رابط الشيت الأول الذي استخرجته أنت
+        const API_URL = "https://script.google.com/macros/s/AKfycbySoiAmMvQt5jY5-iTzx6N2YsP1s5M4QUf5TCE74QJ3AZhS_aFPsCs9a3oJvj8GRnB9rA/exec";
+        
+        let clientPhone = "";
         let generatedOTP = "";
-        const scriptURL = "رابط_API_الشيت_الأول_هنا"; // ضع رابط Web App الخاص بشيت 1
+        let selectedType = "تسليم طبيعي";
+
+        // قاعدة بيانات المدن السريعة
+        const citiesDB = {
+            "القاهرة": ["المعادي", "مدينة نصر", "مصر الجديدة", "وسط البلد", "حلوان", "شبرا"],
+            "الجيزة": ["الدقي", "المهندسين", "الهرم", "6 أكتوبر", "الشيخ زايد"],
+            "البحيرة": ["دمنهور", "كفر الدوار", "إيتاي البارود", "أبو حمص", "كوم حمادة"],
+            "الإسكندرية": ["سموحة", "محرم بك", "السيوف", "العجمي", "المنتزة"],
+            "الدقهلية": ["المنصورة", "طلخا", "ميت غمر"],
+            "الغربية": ["طنطا", "المحلة الكبرى", "كفر الزيات"]
+        };
 
         window.onload = () => {
-            const govS = document.getElementById('govSelect');
-            Object.keys(data).forEach(g => govS.innerHTML += `<option value="${g}">${g}</option>`);
+            const govEl = document.getElementById('gov');
+            Object.keys(citiesDB).forEach(g => govEl.innerHTML += `<option value="${g}">${g}</option>`);
         };
 
-        function updateCities() {
-            const g = document.getElementById('govSelect').value;
-            const cS = document.getElementById('citySelect');
-            cS.innerHTML = '<option value="">اختر المدينة</option>';
-            if(data[g]) data[g].forEach(c => cS.innerHTML += `<option value="${c}">${c}</option>`);
+        function loadCities() {
+            const g = document.getElementById('gov').value;
+            const c = document.getElementById('city');
+            c.innerHTML = '<option value="">اختر المدينة</option>';
+            if(citiesDB[g]) citiesDB[g].forEach(item => c.innerHTML += `<option value="${item}">${item}</option>`);
         }
 
-        function setType(val, id) {
-            currentType = val;
-            document.getElementById('t1').className = 'type-card';
-            document.getElementById('t2').className = 'type-card';
-            document.getElementById(id).classList.add('type-active');
-        }
-
-        // نظام OTP
-        function requestOTP() {
-            const p = document.getElementById('uPhone').value;
-            if(p.length < 10) return alert("رقم خطأ");
+        function sendOTP() {
+            clientPhone = document.getElementById('uPhone').value;
+            if(clientPhone.length < 10) return alert("يرجى إدخال رقم هاتف صحيح");
             
-            // توليد كود وهمي حالياً (يمكن ربطه بـ Twilio لاحقاً)
+            // محاكاة الإرسال (سيظهر تنبيه حتى تربط Twilio)
             generatedOTP = Math.floor(1000 + Math.random() * 9000);
-            alert("كود التحقق الخاص بك هو: " + generatedOTP); // محاكاة للإرسال
+            alert("كود التحقق الخاص بك هو: " + generatedOTP); 
             
-            document.getElementById('loginSection').classList.add('hidden');
-            document.getElementById('verifySection').classList.remove('hidden');
+            document.getElementById('loginStep').classList.add('hidden');
+            document.getElementById('verifyStep').classList.remove('hidden');
         }
 
-        function verifyOTP() {
-            if(document.getElementById('vCode').value == generatedOTP) {
-                document.getElementById('verifySection').classList.add('hidden');
-                document.getElementById('formSection').classList.remove('hidden');
-                document.getElementById('userDisplay').innerText = document.getElementById('uPhone').value;
-            } else {
-                alert("كود خاطئ");
-            }
+        function confirmOTP() {
+            if(document.getElementById('otpInp').value == generatedOTP) {
+                document.getElementById('verifyStep').classList.add('hidden');
+                document.getElementById('formStep').classList.remove('hidden');
+                document.getElementById('userBadge').innerText = clientPhone;
+            } else { alert("الكود الذي أدخلته غير صحيح"); }
         }
 
-        function sendToSheet() {
-            const btn = document.getElementById('sendBtn');
-            btn.innerText = "جاري الإرسال...";
-            btn.disabled = true;
+        function pickType(val, id) {
+            selectedType = val;
+            document.getElementById('t1').classList.remove('active-pill');
+            document.getElementById('t2').classList.remove('active-pill');
+            document.getElementById(id).classList.add('active-pill');
+        }
 
+        function finalizeOrder() {
+            const btn = document.getElementById('finalBtn');
             const payload = {
-                phone: document.getElementById('uPhone').value,
+                phone: clientPhone,
                 name: document.getElementById('rName').value,
                 rPhone: document.getElementById('rPhone').value,
-                gov: document.getElementById('govSelect').value,
-                city: document.getElementById('citySelect').value,
-                type: currentType
+                gov: document.getElementById('gov').value,
+                city: document.getElementById('city').value,
+                type: selectedType
             };
 
-            // إرسال البيانات باستخدام Fetch (متوافق مع GitHub)
-            fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors', // لتجنب مشاكل الـ CORS
-                cache: 'no-cache',
+            if(!payload.name || !payload.gov) return alert("يرجى إكمال البيانات");
+
+            btn.innerText = "جاري الحفظ..."; btn.disabled = true;
+
+            fetch(API_URL, {
+                method: "POST",
+                mode: "no-cors",
+                cache: "no-cache",
                 body: JSON.stringify(payload)
             }).then(() => {
-                alert("تم التسجيل بنجاح!");
+                alert("تم تسجيل طلبك بنجاح! سيتم معالجته وتوليد كود الشحن خلال ثوانٍ.");
                 location.reload();
-            }).catch(e => alert("خطأ: " + e));
+            }).catch(e => {
+                alert("خطأ في الشبكة، حاول مرة أخرى.");
+                btn.innerText = "تأكيد الأوردر الآن"; btn.disabled = false;
+            });
         }
     </script>
 </body>
