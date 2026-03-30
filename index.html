@@ -1,977 +1,936 @@
 <!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>بوابة الشحن الذكية</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>بوابة الشحن الذكية</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-  <style>
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    <style>
+        * { box-sizing: border-box; }
 
-    body {
-      font-family: 'Cairo', sans-serif;
-      min-height: 100vh;
-      margin: 0;
-      padding: 18px;
-      color: #f8fafc;
-      background:
-        radial-gradient(circle at top right, rgba(56,189,248,0.15), transparent 20%),
-        radial-gradient(circle at bottom left, rgba(168,85,247,0.18), transparent 25%),
-        linear-gradient(135deg, #020617, #0f172a, #111827);
-      overflow-x: hidden;
-    }
+        body {
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 18px;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top right, rgba(56,189,248,0.18), transparent 30%),
+                radial-gradient(circle at bottom left, rgba(168,85,247,0.18), transparent 30%),
+                linear-gradient(135deg, #020617 0%, #0f172a 45%, #111827 100%);
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
 
-    .noise {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0.03;
-      background-image:
-        radial-gradient(#fff 0.4px, transparent 0.4px);
-      background-size: 6px 6px;
-      z-index: 0;
-    }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            backdrop-filter: blur(12px);
+            pointer-events: none;
+            z-index: 0;
+        }
 
-    .glass-card {
-      position: relative;
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(148, 163, 184, 0.15);
-      border-radius: 28px;
-      box-shadow:
-        0 0 0 1px rgba(255,255,255,0.03) inset,
-        0 20px 60px rgba(0,0,0,0.45),
-        0 0 35px rgba(56,189,248,0.08),
-        0 0 55px rgba(168,85,247,0.06);
-      overflow: hidden;
-      animation: fadeUp 0.6s ease;
-    }
+        .app-shell {
+            position: relative;
+            z-index: 2;
+        }
 
-    .glass-card::before {
-      content: "";
-      position: absolute;
-      inset: -2px;
-      border-radius: 28px;
-      padding: 1px;
-      background: linear-gradient(135deg, rgba(56,189,248,0.35), rgba(168,85,247,0.25), rgba(14,165,233,0.35));
-      -webkit-mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      pointer-events: none;
-    }
+        .card {
+            width: 100%;
+            max-width: 920px;
+            margin: auto;
+            padding: 28px;
+            border-radius: 30px;
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            box-shadow:
+                0 20px 60px rgba(0,0,0,0.45),
+                inset 0 1px 0 rgba(255,255,255,0.04),
+                0 0 30px rgba(56,189,248,0.08);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            animation: fadeUp .45s ease;
+        }
 
-    .title-neon {
-      text-shadow:
-        0 0 8px rgba(56,189,248,0.45),
-        0 0 18px rgba(56,189,248,0.25),
-        0 0 28px rgba(168,85,247,0.18);
-    }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(18px) scale(.985); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
 
-    .sub-glow {
-      color: #cbd5e1;
-      text-shadow: 0 0 12px rgba(255,255,255,0.05);
-    }
+        .neon-title {
+            background: linear-gradient(90deg, #38bdf8, #a78bfa, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(56,189,248,.18);
+        }
 
-    .input-style, .select-style, .textarea-style {
-      width: 100%;
-      background: rgba(51, 65, 85, 0.55);
-      border: 1px solid rgba(148, 163, 184, 0.22);
-      color: #fff;
-      border-radius: 16px;
-      padding: 15px 16px;
-      outline: none;
-      transition: 0.25s ease;
-      text-align: right;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
-    }
+        .input-style, .textarea-style, select {
+            width: 100%;
+            padding: 15px 16px;
+            border-radius: 18px;
+            border: 1px solid rgba(148,163,184,.22);
+            background: rgba(51, 65, 85, 0.55);
+            color: white;
+            outline: none;
+            transition: .25s ease;
+            text-align: right;
+            backdrop-filter: blur(12px);
+            margin-bottom: 14px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+        }
 
-    .input-style::placeholder,
-    .textarea-style::placeholder {
-      color: #94a3b8;
-    }
+        .input-style::placeholder,
+        .textarea-style::placeholder {
+            color: #cbd5e1;
+        }
 
-    .input-style:focus, .select-style:focus, .textarea-style:focus {
-      border-color: #38bdf8;
-      box-shadow:
-        0 0 0 4px rgba(56,189,248,0.12),
-        0 0 22px rgba(56,189,248,0.15);
-      transform: translateY(-1px);
-    }
+        .input-style:focus,
+        .textarea-style:focus,
+        select:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 4px rgba(56,189,248,0.14), 0 0 25px rgba(56,189,248,0.18);
+            transform: translateY(-1px);
+        }
 
-    .textarea-style {
-      min-height: 95px;
-      resize: vertical;
-    }
+        .textarea-style {
+            min-height: 90px;
+            resize: vertical;
+        }
 
-    .btn-neon {
-      width: 100%;
-      border: none;
-      border-radius: 18px;
-      padding: 16px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: 0.25s ease;
-      background: linear-gradient(135deg, #38bdf8, #0ea5e9, #7c3aed);
-      color: #fff;
-      box-shadow:
-        0 10px 30px rgba(14,165,233,0.28),
-        0 0 20px rgba(56,189,248,0.18);
-    }
+        .btn {
+            width: 100%;
+            border: none;
+            border-radius: 18px;
+            padding: 15px 18px;
+            cursor: pointer;
+            font-weight: 800;
+            transition: .22s ease;
+            color: #020617;
+            background: linear-gradient(135deg, #38bdf8, #22d3ee);
+            box-shadow: 0 10px 25px rgba(56,189,248,.28), 0 0 18px rgba(34,211,238,.12);
+        }
 
-    .btn-neon:hover {
-      transform: translateY(-2px) scale(1.01);
-      box-shadow:
-        0 14px 36px rgba(14,165,233,0.35),
-        0 0 26px rgba(56,189,248,0.28);
-    }
+        .btn:hover {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 18px 35px rgba(56,189,248,.32), 0 0 24px rgba(34,211,238,.16);
+        }
 
-    .btn-neon:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
+        .btn:active {
+            transform: scale(.985);
+        }
 
-    .btn-soft {
-      width: 100%;
-      border: none;
-      border-radius: 18px;
-      padding: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.25s ease;
-      background: rgba(71, 85, 105, 0.55);
-      color: #fff;
-      border: 1px solid rgba(148, 163, 184, 0.18);
-    }
+        .btn:disabled {
+            opacity: .65;
+            cursor: not-allowed;
+            transform: none;
+        }
 
-    .btn-soft:hover {
-      transform: translateY(-2px);
-      background: rgba(100, 116, 139, 0.62);
-    }
+        .btn-secondary {
+            background: rgba(71,85,105,.75);
+            color: white;
+            box-shadow: none;
+        }
 
-    .hidden { display: none !important; }
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #f97316);
+            color: white;
+            box-shadow: 0 10px 25px rgba(239,68,68,.22);
+        }
 
-    .pill {
-      background: rgba(30, 41, 59, 0.85);
-      border: 1px solid rgba(148, 163, 184, 0.15);
-      padding: 14px;
-      border-radius: 16px;
-      text-align: center;
-      cursor: pointer;
-      transition: 0.22s ease;
-      font-weight: 700;
-      color: #cbd5e1;
-      user-select: none;
-    }
+        .hidden { display: none !important; }
 
-    .pill:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 18px rgba(56,189,248,0.12);
-    }
+        .type-pill {
+            flex: 1;
+            text-align: center;
+            padding: 14px;
+            border-radius: 18px;
+            cursor: pointer;
+            border: 1px solid rgba(148,163,184,.16);
+            background: rgba(51,65,85,.45);
+            transition: .22s ease;
+            font-weight: 700;
+        }
 
-    .active-pill {
-      border-color: #38bdf8;
-      color: #fff;
-      background: linear-gradient(135deg, rgba(14,165,233,0.22), rgba(124,58,237,0.18));
-      box-shadow:
-        0 0 0 1px rgba(56,189,248,0.12) inset,
-        0 0 18px rgba(56,189,248,0.16);
-    }
+        .type-pill:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(0,0,0,.18);
+        }
 
-    .fab {
-      position: fixed;
-      bottom: 24px;
-      left: 24px;
-      width: 68px;
-      height: 68px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      font-weight: bold;
-      cursor: pointer;
-      z-index: 1000;
-      background: linear-gradient(135deg, #38bdf8, #7c3aed);
-      color: #fff;
-      box-shadow:
-        0 10px 30px rgba(56,189,248,0.28),
-        0 0 24px rgba(124,58,237,0.28);
-      transition: 0.25s ease;
-    }
+        .active-pill {
+            background: linear-gradient(135deg, rgba(56,189,248,.18), rgba(168,85,247,.16));
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 2px rgba(56,189,248,.18), 0 0 18px rgba(56,189,248,.16);
+        }
 
-    .fab:hover {
-      transform: scale(1.08) rotate(8deg);
-    }
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #020617;
+            background: linear-gradient(135deg, #38bdf8, #22d3ee);
+            box-shadow: 0 15px 35px rgba(56,189,248,.32), 0 0 28px rgba(34,211,238,.18);
+            transition: .25s ease;
+            z-index: 1000;
+        }
 
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(2,6,23,0.78);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 16px;
-      z-index: 1200;
-      animation: fadeIn 0.25s ease;
-    }
+        .fab:hover {
+            transform: scale(1.07) rotate(8deg);
+        }
 
-    .modal-content {
-      width: 100%;
-      max-width: 950px;
-      max-height: 92vh;
-      overflow-y: auto;
-      padding: 22px;
-      border-radius: 28px;
-      background: rgba(15,23,42,0.88);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(148,163,184,0.16);
-      box-shadow:
-        0 30px 80px rgba(0,0,0,0.55),
-        0 0 35px rgba(56,189,248,0.08);
-      animation: scaleIn 0.28s ease;
-    }
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(2,6,23,.72);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1100;
+            padding: 18px;
+            backdrop-filter: blur(8px);
+        }
 
-    .section-label {
-      font-size: 13px;
-      color: #94a3b8;
-      margin-bottom: 8px;
-      font-weight: 700;
-      padding-right: 4px;
-    }
+        .modal-content {
+            width: 100%;
+            max-width: 760px;
+            max-height: 92vh;
+            overflow-y: auto;
+            border-radius: 28px;
+            padding: 24px;
+            background: rgba(15, 23, 42, 0.82);
+            border: 1px solid rgba(148,163,184,.16);
+            box-shadow: 0 30px 80px rgba(0,0,0,.48), 0 0 30px rgba(56,189,248,.08);
+            animation: fadeUp .3s ease;
+        }
 
-    .order-card {
-      position: relative;
-      background: rgba(15,23,42,0.72);
-      border: 1px solid rgba(148,163,184,0.14);
-      border-radius: 24px;
-      padding: 18px;
-      overflow: hidden;
-      transition: 0.25s ease;
-      box-shadow:
-        0 10px 30px rgba(0,0,0,0.22),
-        0 0 20px rgba(56,189,248,0.05);
-    }
+        .order-card {
+            background: rgba(15,23,42,.75);
+            border: 1px solid rgba(148,163,184,.12);
+            border-radius: 24px;
+            padding: 18px;
+            margin-bottom: 16px;
+            box-shadow: 0 14px 35px rgba(0,0,0,.22);
+            transition: .25s ease;
+        }
 
-    .order-card::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 5px;
-      height: 100%;
-      background: linear-gradient(180deg, #38bdf8, #7c3aed);
-      box-shadow: 0 0 20px rgba(56,189,248,0.5);
-    }
+        .order-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 42px rgba(0,0,0,.28), 0 0 22px rgba(56,189,248,.08);
+        }
 
-    .order-card:hover {
-      transform: translateY(-3px);
-      box-shadow:
-        0 18px 38px rgba(0,0,0,0.28),
-        0 0 28px rgba(56,189,248,0.08);
-    }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: .2px;
+        }
 
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.2px;
-    }
+        .status-delivered { background: rgba(16,185,129,.18); color: #34d399; border: 1px solid rgba(16,185,129,.25); }
+        .status-pending { background: rgba(245,158,11,.18); color: #fbbf24; border: 1px solid rgba(245,158,11,.25); }
+        .status-shipped { background: rgba(59,130,246,.18); color: #60a5fa; border: 1px solid rgba(59,130,246,.25); }
+        .status-cancelled { background: rgba(239,68,68,.18); color: #f87171; border: 1px solid rgba(239,68,68,.25); }
 
-    .status-delivered { background: rgba(16,185,129,0.18); color: #34d399; border: 1px solid rgba(16,185,129,0.28); }
-    .status-pending { background: rgba(245,158,11,0.18); color: #fbbf24; border: 1px solid rgba(245,158,11,0.28); }
-    .status-shipped { background: rgba(59,130,246,0.18); color: #60a5fa; border: 1px solid rgba(59,130,246,0.28); }
-    .status-cancelled { background: rgba(239,68,68,0.18); color: #f87171; border: 1px solid rgba(239,68,68,0.28); }
+        .sub-state-box {
+            margin-top: 12px;
+            padding: 14px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(56,189,248,.08), rgba(168,85,247,.08));
+            border: 1px solid rgba(56,189,248,.16);
+            color: #e2e8f0;
+            font-size: 14px;
+            line-height: 1.8;
+        }
 
-    .tiny-label {
-      font-size: 12px;
-      color: #94a3b8;
-    }
+        .glass-line {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(148,163,184,.25), transparent);
+            margin: 18px 0;
+        }
 
-    .neon-line {
-      height: 1px;
-      width: 100%;
-      background: linear-gradient(90deg, transparent, rgba(56,189,248,0.5), rgba(168,85,247,0.45), transparent);
-      margin: 16px 0;
-    }
+        .link-btn {
+            background: transparent;
+            border: none;
+            color: #38bdf8;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 14px;
+        }
 
-    .stat-box {
-      background: rgba(15,23,42,0.62);
-      border: 1px solid rgba(148,163,184,0.12);
-      border-radius: 22px;
-      padding: 18px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(14px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes scaleIn {
-      from { opacity: 0; transform: scale(0.96); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    @media (max-width: 768px) {
-      body { padding: 14px; }
-      .modal-content { padding: 18px; }
-      .fab {
-        width: 60px;
-        height: 60px;
-        font-size: 28px;
-        bottom: 18px;
-        left: 18px;
-      }
-    }
-  </style>
+        @media (max-width: 640px) {
+            .card { padding: 20px; border-radius: 24px; }
+            .modal-content { padding: 18px; border-radius: 22px; }
+            .fab { width: 62px; height: 62px; font-size: 30px; }
+        }
+    </style>
 </head>
 <body>
-<div class="noise"></div>
 
-<div id="app" class="max-w-6xl mx-auto relative z-10">
+<div id="app" class="app-shell max-w-5xl mx-auto">
 
-  <!-- شاشة تسجيل الدخول -->
-  <div id="loginScreen" class="glass-card max-w-xl mx-auto p-8 mt-8">
-    <div class="text-center mb-8">
-      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-sky-400/20 bg-sky-500/10 text-sky-300 text-sm mb-4">
-        ✨ نظام شحن ذكي
-      </div>
-      <h1 class="text-3xl md:text-4xl font-extrabold title-neon text-sky-300">بوابة الشحن الذكية</h1>
-      <p class="sub-glow mt-3">تسجيل دخول سريع وآمن لمتابعة شحناتك</p>
-    </div>
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginScreen" class="card">
+        <h2 class="text-3xl font-extrabold text-center mb-2 neon-title">بوابة الشحن الذكية</h2>
+        <p class="text-center text-slate-300 mb-6">تسجيل الدخول إلى حسابك</p>
 
-    <div class="space-y-4">
-      <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" class="input-style">
-      <input type="password" id="loginPassword" placeholder="كلمة المرور" class="input-style">
-      <button onclick="loginWithPassword()" class="btn-neon">دخول</button>
-    </div>
+        <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" class="input-style">
+        <input type="password" id="loginPassword" placeholder="كلمة المرور" class="input-style">
 
-    <div class="neon-line"></div>
+        <button onclick="loginWithPassword()" class="btn">دخول</button>
 
-    <button onclick="showOtpScreen()" class="btn-soft">إنشاء حساب جديد</button>
-  </div>
-
-  <!-- شاشة إرسال OTP -->
-  <div id="otpSendScreen" class="glass-card max-w-xl mx-auto p-8 mt-8 hidden">
-    <div class="text-center mb-8">
-      <h2 class="text-2xl font-extrabold text-sky-300 title-neon">إنشاء حساب جديد</h2>
-      <p class="sub-glow mt-2">أدخل بريدك الإلكتروني لإرسال كود التحقق</p>
-    </div>
-
-    <div class="space-y-4">
-      <input type="email" id="regEmail" placeholder="البريد الإلكتروني" class="input-style">
-      <button onclick="sendOTP()" id="sendOtpBtn" class="btn-neon">إرسال كود التحقق</button>
-      <button onclick="backToLogin()" class="btn-soft">رجوع</button>
-    </div>
-  </div>
-
-  <!-- شاشة التحقق -->
-  <div id="otpVerifyScreen" class="glass-card max-w-xl mx-auto p-8 mt-8 hidden">
-    <div class="text-center mb-8">
-      <h2 class="text-2xl font-extrabold text-sky-300 title-neon">تأكيد الرمز</h2>
-      <p class="sub-glow mt-2">تم إرسال كود التحقق إلى بريدك</p>
-    </div>
-
-    <div class="space-y-4">
-      <input type="number" id="otpCode" placeholder="رمز التحقق" class="input-style">
-      <input type="password" id="newPassword" placeholder="كلمة المرور الجديدة" class="input-style">
-      <button onclick="verifyAndRegister()" class="btn-neon">إنشاء الحساب</button>
-    </div>
-  </div>
-
-  <!-- لوحة التحكم -->
-  <div id="dashboardScreen" class="hidden">
-    <div class="glass-card p-6 md:p-8 mt-4">
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-        <div>
-          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-sky-400/20 bg-sky-500/10 text-sky-300 text-sm mb-3">
-            🚚 لوحة الشحن
-          </div>
-          <h2 class="text-3xl font-extrabold text-sky-300 title-neon">لوحة التحكم</h2>
-          <p class="sub-glow mt-2">عرض وتتبع جميع الشحنات الخاصة بك</p>
+        <div class="text-center mt-4">
+            <button onclick="showResetScreen()" class="link-btn">نسيت كلمة المرور / تغيير كلمة المرور</button>
         </div>
 
-        <div class="flex gap-3">
-          <button onclick="loadUserOrders()" class="btn-soft px-5 py-3 w-auto">تحديث</button>
-          <button onclick="logout()" class="btn-soft px-5 py-3 w-auto bg-red-500/15 border-red-400/20 text-red-300">تسجيل خروج</button>
-        </div>
-      </div>
+        <div class="glass-line"></div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div class="stat-box">
-          <div class="tiny-label mb-1">عدد الشحنات</div>
-          <div id="statTotal" class="text-2xl font-extrabold text-white">0</div>
-        </div>
-        <div class="stat-box">
-          <div class="tiny-label mb-1">قيد المراجعة / التنفيذ</div>
-          <div id="statPending" class="text-2xl font-extrabold text-amber-300">0</div>
-        </div>
-        <div class="stat-box">
-          <div class="tiny-label mb-1">تم التوصيل</div>
-          <div id="statDelivered" class="text-2xl font-extrabold text-emerald-300">0</div>
-        </div>
-      </div>
-
-      <div id="ordersList" class="space-y-4">
-        <!-- الطلبات -->
-      </div>
+        <button onclick="showOtpScreen()" class="btn btn-secondary">إنشاء حساب جديد</button>
     </div>
-  </div>
+
+    <!-- شاشة إرسال الرمز للتسجيل -->
+    <div id="otpSendScreen" class="card hidden">
+        <h2 class="text-2xl font-bold text-center mb-4 neon-title">إنشاء حساب جديد</h2>
+        <input type="email" id="regEmail" placeholder="البريد الإلكتروني" class="input-style">
+        <button onclick="sendOTP()" id="sendOtpBtn" class="btn">إرسال كود التحقق</button>
+        <button onclick="backToLogin()" class="btn btn-secondary mt-2">رجوع</button>
+    </div>
+
+    <!-- شاشة إدخال الرمز وكلمة المرور -->
+    <div id="otpVerifyScreen" class="card hidden">
+        <h2 class="text-2xl font-bold text-center mb-4 neon-title">تأكيد الرمز</h2>
+        <p class="text-slate-300 text-sm text-center mb-4">تم إرسال الكود إلى بريدك الإلكتروني</p>
+        <input type="number" id="otpCode" placeholder="رمز التحقق" class="input-style">
+        <input type="password" id="newPassword" placeholder="كلمة المرور الجديدة" class="input-style">
+        <button onclick="verifyAndRegister()" class="btn">إنشاء الحساب</button>
+        <button onclick="backToLogin()" class="btn btn-secondary mt-2">رجوع</button>
+    </div>
+
+    <!-- شاشة إرسال كود تغيير كلمة المرور -->
+    <div id="resetSendScreen" class="card hidden">
+        <h2 class="text-2xl font-bold text-center mb-4 neon-title">تغيير كلمة المرور</h2>
+        <p class="text-slate-300 text-sm text-center mb-4">سنرسل لك كود تحقق إلى بريدك الإلكتروني</p>
+        <input type="email" id="resetEmail" placeholder="البريد الإلكتروني" class="input-style">
+        <button onclick="sendResetOTP()" id="sendResetOtpBtn" class="btn">إرسال كود التحقق</button>
+        <button onclick="backToLogin()" class="btn btn-secondary mt-2">رجوع</button>
+    </div>
+
+    <!-- شاشة تأكيد كود تغيير كلمة المرور -->
+    <div id="resetVerifyScreen" class="card hidden">
+        <h2 class="text-2xl font-bold text-center mb-4 neon-title">تأكيد تغيير كلمة المرور</h2>
+        <p class="text-slate-300 text-sm text-center mb-4">أدخل الكود الذي وصلك على البريد</p>
+        <input type="number" id="resetOtpCode" placeholder="رمز التحقق" class="input-style">
+        <input type="password" id="resetNewPassword" placeholder="كلمة المرور الجديدة" class="input-style">
+        <button onclick="verifyAndChangePassword()" class="btn">تغيير كلمة المرور</button>
+        <button onclick="backToLogin()" class="btn btn-secondary mt-2">رجوع</button>
+    </div>
+
+    <!-- لوحة التحكم -->
+    <div id="dashboardScreen" class="hidden">
+        <div class="card">
+            <div class="flex justify-between items-center mb-6 gap-3 flex-wrap">
+                <div>
+                    <h2 class="text-3xl font-extrabold neon-title">لوحة التحكم</h2>
+                    <p class="text-slate-300 text-sm mt-1">إدارة ومتابعة الشحنات الخاصة بك</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="showResetScreen()" class="btn btn-secondary text-sm px-4 py-2 !w-auto">تغيير كلمة المرور</button>
+                    <button onclick="logout()" class="btn btn-danger text-sm px-4 py-2 !w-auto">تسجيل خروج</button>
+                </div>
+            </div>
+
+            <div id="ordersList" class="space-y-3">
+                <!-- الطلبات -->
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- زر عائم -->
-<div id="fab" class="fab hidden" onclick="openOrderForm()">＋</div>
+<div id="fab" class="fab hidden" onclick="openOrderForm()">+</div>
 
 <!-- مودال إضافة شحنة -->
 <div id="orderModal" class="modal hidden">
-  <div class="modal-content">
-    <div class="flex justify-between items-center mb-6">
-      <div>
-        <h3 class="text-2xl font-extrabold text-sky-300 title-neon">تسجيل شحنة جديدة</h3>
-        <p class="text-slate-400 text-sm mt-1">املأ بيانات الشحنة بدقة</p>
-      </div>
-      <button onclick="closeOrderForm()" class="text-white text-3xl leading-none hover:scale-110 transition">&times;</button>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <div class="section-label">1) اسم المستلم</div>
-        <input type="text" id="rName" placeholder="اسم المستلم" class="input-style">
-      </div>
-
-      <div>
-        <div class="section-label">2) رقم هاتف المستلم</div>
-        <input type="tel" id="rPhone" placeholder="رقم هاتف المستلم" class="input-style">
-      </div>
-
-      <div>
-        <div class="section-label">3) رقم هاتف آخر للمستلم</div>
-        <input type="tel" id="rPhone2" placeholder="رقم هاتف آخر" class="input-style">
-      </div>
-
-      <div>
-        <div class="section-label">4) المحافظة</div>
-        <select id="gov" class="select-style" onchange="loadCities()">
-          <option value="">اختر المحافظة</option>
-        </select>
-      </div>
-
-      <div>
-        <div class="section-label">5) المدينة</div>
-        <select id="city" class="select-style">
-          <option value="">اختر المدينة</option>
-        </select>
-      </div>
-
-      <div>
-        <div class="section-label">6) منطقة الوصول</div>
-        <input type="text" id="arrivalArea" placeholder="منطقة الوصول" class="input-style">
-      </div>
-
-      <div>
-        <div class="section-label">7) شارع المستلم</div>
-        <input type="text" id="street" placeholder="اسم الشارع / العنوان التفصيلي" class="input-style">
-      </div>
-
-      <div>
-        <div class="section-label">8) وزن البضاعة (بحد أقصى 30 كجم)</div>
-        <input type="number" id="weight" placeholder="مثال: 5" class="input-style" min="0.1" max="30" step="0.1">
-      </div>
-
-      <div>
-        <div class="section-label">9) المبلغ المطلوب تحصيله</div>
-        <input type="number" id="amount" placeholder="مثال: 350" class="input-style" min="0" step="0.01">
-      </div>
-
-      <div class="md:col-span-2">
-        <div class="section-label">10) نوع الشحن</div>
-        <div class="grid grid-cols-2 gap-3">
-          <div id="t1" onclick="selectType('تسليم طبيعي', 't1')" class="pill active-pill">تسليم طبيعي</div>
-          <div id="t2" onclick="selectType('استبدال', 't2')" class="pill">استبدال</div>
+    <div class="modal-content">
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-2xl font-bold neon-title">تسجيل شحنة جديدة</h3>
+            <button onclick="closeOrderForm()" class="text-white text-3xl leading-none">&times;</button>
         </div>
-      </div>
 
-      <div class="md:col-span-2">
-        <div class="section-label">11) ملاحظات مكان التسليم</div>
-        <textarea id="noteLoc" placeholder="مثال: الدور الثالث - بجوار الصيدلية - اتصل قبل الوصول" class="textarea-style"></textarea>
-      </div>
+        <input type="text" id="rName" placeholder="1) اسم المستلم" class="input-style">
+        <input type="tel" id="rPhone" placeholder="2) رقم هاتف المستلم" class="input-style">
+        <input type="tel" id="rPhone2" placeholder="3) رقم هاتف آخر للمستلم" class="input-style">
 
-      <div class="md:col-span-2">
-        <div class="section-label">12) ملاحظات الأوردر</div>
-        <textarea id="noteOrd" placeholder="أي ملاحظات إضافية خاصة بالشحنة أو المنتج" class="textarea-style"></textarea>
-      </div>
+        <select id="gov" class="input-style" onchange="loadCities()">
+            <option value="">4) اختر المحافظة</option>
+        </select>
+
+        <select id="city" class="input-style">
+            <option value="">5) اختر المدينة</option>
+        </select>
+
+        <input type="text" id="area" placeholder="6) منطقة الوصول" class="input-style">
+        <input type="text" id="street" placeholder="7) شارع المستلم" class="input-style">
+        <input type="number" id="weight" placeholder="8) وزن البضاعة (بحد أقصى 30 كجم)" class="input-style" min="0" max="30" step="0.1">
+        <input type="number" id="amount" placeholder="9) المبلغ المطلوب تحصيله" class="input-style" min="0" step="0.01">
+
+        <div class="flex gap-2 mb-4">
+            <div id="t1" onclick="selectType('تسليم طبيعي', 't1')" class="type-pill active-pill">تسليم طبيعي</div>
+            <div id="t2" onclick="selectType('استبدال', 't2')" class="type-pill">استبدال</div>
+        </div>
+
+        <textarea id="noteLoc" placeholder="11) ملاحظات مكان التسليم" class="textarea-style"></textarea>
+        <textarea id="noteOrd" placeholder="12) ملاحظات الأوردر" class="textarea-style"></textarea>
+
+        <button onclick="submitOrder()" id="submitOrderBtn" class="btn">تأكيد الشحنة</button>
     </div>
-
-    <div class="mt-6 flex flex-col md:flex-row gap-3">
-      <button onclick="submitOrder()" id="submitOrderBtn" class="btn-neon">تأكيد الشحنة</button>
-      <button onclick="closeOrderForm()" class="btn-soft">إلغاء</button>
-    </div>
-  </div>
 </div>
 
 <script>
-  // ============================
-  // الروابط - تم ربطها لك
-  // ============================
-  const SHEET_API = "https://script.google.com/macros/s/AKfycbykkDVCCSRJN_Mggq5yzvHLismlhcO10qAHCwFYZx_e8ClljIFjY2OW0IRicL9ke9lvZg/exec";
-  const FORMSPREE_URL = "https://formspree.io/f/mbdpgong";
+    // =========================
+    // الروابط
+    // =========================
+    const SHEET_API = "https://script.google.com/macros/s/AKfycbyFI_CGN1ZlojuOfMQYgxPkCyVP_8oCcxHxcqkhiisV3g5ZngM5GRJlI7uor6CRMcQPRA/exec";
+    const FORMSPREE_URL = "https://formspree.io/f/mbdpgong";
 
-  // ============================
-  // بيانات المحافظات والمدن
-  // ============================
-  const egyptGovernorates = {
-    "القاهرة": ["المعادي", "التجمع الخامس", "مدينة نصر", "وسط البلد", "مصر الجديدة", "شبرا", "العباسية", "الزمالك"],
-    "الجيزة": ["أكتوبر", "الشيخ زايد", "الهرم", "فيصل", "العجوزة", "المهندسين", "البدرشين", "الصف"],
-    "الإسكندرية": ["المنتزه", "سيدي جابر", "محرم بك", "العجمي", "برج العرب", "الدخيلة"],
-    "البحيرة": ["دمنهور", "كفر الدوار", "أبو حمص", "رشيد", "إيتاي البارود"],
-    "الشرقية": ["الزقازيق", "العاشر من رمضان", "منيا القمح", "بلبيس", "أبو كبير"],
-    "الدقهلية": ["المنصورة", "طلخا", "ميت غمر", "أجا", "شربين"],
-    "المنوفية": ["شبين الكوم", "السادات", "منوف", "الباجور", "قويسنا"],
-    "القليوبية": ["بنها", "شبرا الخيمة", "قليوب", "الخانكة", "طوخ"],
-    "الغربية": ["طنطا", "المحلة الكبرى", "سمنود", "زفتى", "بسيون"],
-    "كفر الشيخ": ["كفر الشيخ", "دسوق", "بيلا", "فوه", "الرياض"],
-    "بورسعيد": ["بورسعيد", "الضواحي"],
-    "السويس": ["السويس", "الأربعين"],
-    "الإسماعيلية": ["الإسماعيلية", "فايد", "التل الكبير"],
-    "دمياط": ["دمياط", "فارسكور", "كفر سعد", "الزرقا"],
-    "أسوان": ["أسوان", "إدفو", "كوم أمبو", "نصر النوبة"],
-    "الأقصر": ["الأقصر", "البياضية", "القرنة", "إسنا", "أرمنت"],
-    "قنا": ["قنا", "نقادة", "قفط", "فرشوط"],
-    "سوهاج": ["سوهاج", "أخميم", "البلينا", "طهطا"],
-    "أسيوط": ["أسيوط", "ديروط", "الفتح", "أبنوب", "القوصية"],
-    "المنيا": ["المنيا", "بني مزار", "مطاي", "سمالوط", "ملوي"],
-    "بني سويف": ["بني سويف", "الواسطى", "ناصر", "ببا"],
-    "الفيوم": ["الفيوم", "طامية", "سنورس", "إبشواي"],
-    "شمال سيناء": ["العريش", "الشيخ زويد", "رفح"],
-    "جنوب سيناء": ["الطور", "شرم الشيخ", "دهب", "نويبع", "رأس سدر"],
-    "البحر الأحمر": ["الغردقة", "رأس غارب", "القصير", "مرسى علم"],
-    "الوادي الجديد": ["الخارجة", "الداخلة", "الفرافرة", "بلاط"],
-    "مطروح": ["مرسى مطروح", "الضبعة", "السلوم", "سيوة"]
-  };
-
-  let currentUserEmail = null;
-  let tempEmail = null;
-  let generatedOTP = null;
-  let selectedShipType = "تسليم طبيعي";
-
-  // ============================
-  // واجهة المستخدم
-  // ============================
-  function showScreen(id) {
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('otpSendScreen').classList.add('hidden');
-    document.getElementById('otpVerifyScreen').classList.add('hidden');
-    document.getElementById('dashboardScreen').classList.add('hidden');
-
-    document.getElementById(id).classList.remove('hidden');
-
-    if (id === 'dashboardScreen') {
-      document.getElementById('fab').classList.remove('hidden');
-      loadUserOrders();
-    } else {
-      document.getElementById('fab').classList.add('hidden');
-    }
-  }
-
-  function backToLogin() {
-    showScreen('loginScreen');
-  }
-
-  function showOtpScreen() {
-    showScreen('otpSendScreen');
-  }
-
-  function loadGovernorates() {
-    const govSelect = document.getElementById('gov');
-    govSelect.innerHTML = '<option value="">اختر المحافظة</option>';
-    Object.keys(egyptGovernorates).sort().forEach(g => {
-      govSelect.innerHTML += `<option value="${g}">${g}</option>`;
-    });
-  }
-
-  function loadCities() {
-    const gov = document.getElementById('gov').value;
-    const citySelect = document.getElementById('city');
-    citySelect.innerHTML = '<option value="">اختر المدينة</option>';
-    if (egyptGovernorates[gov]) {
-      egyptGovernorates[gov].forEach(c => {
-        citySelect.innerHTML += `<option value="${c}">${c}</option>`;
-      });
-    }
-  }
-
-  function selectType(v, id) {
-    selectedShipType = v;
-    document.getElementById('t1').classList.remove('active-pill');
-    document.getElementById('t2').classList.remove('active-pill');
-    document.getElementById(id).classList.add('active-pill');
-  }
-
-  async function getClientIP() {
-    try {
-      const res = await fetch('https://api.ipify.org?format=json');
-      const data = await res.json();
-      return data.ip;
-    } catch (e) {
-      console.warn("فشل الحصول على IP", e);
-      return "unknown";
-    }
-  }
-
-  // ============================
-  // تسجيل الدخول
-  // ============================
-  async function loginWithPassword() {
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-
-    if (!email || !password) return alert("أدخل البريد وكلمة المرور");
-
-    try {
-      const url = `${SHEET_API}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
-      const response = await fetch(url);
-      const result = await response.json();
-
-      if (result.success) {
-        currentUserEmail = email;
-        localStorage.setItem('userEmail', email);
-        showScreen('dashboardScreen');
-      } else {
-        alert("بريد أو كلمة مرور غير صحيحة");
-      }
-    } catch (e) {
-      alert("تعذر الاتصال بالخادم");
-    }
-  }
-
-  // ============================
-  // OTP / التسجيل
-  // ============================
-  async function sendOTP() {
-    const email = document.getElementById('regEmail').value.trim();
-    if (!email.includes("@")) return alert("بريد غير صحيح");
-
-    tempEmail = email;
-    generatedOTP = Math.floor(1000 + Math.random() * 9000);
-
-    const btn = document.getElementById('sendOtpBtn');
-    btn.innerText = "جارٍ الإرسال...";
-    btn.disabled = true;
-
-    try {
-      const response = await fetch(FORMSPREE_URL, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: tempEmail,
-          message: `كود التحقق الخاص بك هو: ${generatedOTP}`
-        })
-      });
-
-      if (response.ok) {
-        alert("تم إرسال الكود، تفقد بريدك");
-        showScreen('otpVerifyScreen');
-      } else {
-        alert("فشل الإرسال، تأكد من إعدادات Formspree");
-      }
-    } catch (e) {
-      alert("خطأ في الاتصال");
-    }
-
-    btn.disabled = false;
-    btn.innerText = "إرسال كود التحقق";
-  }
-
-  async function verifyAndRegister() {
-    const enteredOtp = document.getElementById('otpCode').value;
-    const newPass = document.getElementById('newPassword').value;
-
-    if (enteredOtp != generatedOTP) return alert("الكود غير صحيح");
-    if (newPass.length < 4) return alert("كلمة المرور يجب أن تكون 4 أحرف على الأقل");
-
-    try {
-      const url = `${SHEET_API}?action=register&email=${encodeURIComponent(tempEmail)}&password=${encodeURIComponent(newPass)}`;
-      const response = await fetch(url);
-      const result = await response.json();
-
-      if (result.success) {
-        alert("تم إنشاء الحساب بنجاح");
-        currentUserEmail = tempEmail;
-        localStorage.setItem('userEmail', tempEmail);
-        showScreen('dashboardScreen');
-      } else {
-        alert("فشل التسجيل: " + (result.error || "البريد موجود مسبقاً"));
-      }
-    } catch (e) {
-      alert("تعذر التسجيل الآن");
-    }
-  }
-
-  // ============================
-  // جلب الطلبات
-  // ============================
-  async function loadUserOrders() {
-    if (!currentUserEmail) return;
-
-    try {
-      const url = `${SHEET_API}?action=getOrders&email=${encodeURIComponent(currentUserEmail)}`;
-      const response = await fetch(url);
-      const orders = await response.json();
-
-      const container = document.getElementById('ordersList');
-
-      if (!orders.length) {
-        container.innerHTML = `
-          <div class="glass-card p-8 text-center">
-            <div class="text-5xl mb-3">📦</div>
-            <div class="text-lg font-bold text-white mb-2">لا توجد شحنات حتى الآن</div>
-            <div class="text-slate-400">اضغط على زر + لإضافة أول شحنة</div>
-          </div>
-        `;
-        updateStats([]);
-        return;
-      }
-
-      container.innerHTML = '';
-
-      orders.reverse().forEach(order => {
-        const statusClass = getStatusClass(order.status);
-        const currentStage = order.currentStage || "لم يتم تحديث الحالة الحالية بعد";
-
-        const card = `
-          <div class="order-card">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-3">
-              <div>
-                <div class="text-lg font-extrabold text-white">رقم الشحنة: ${order.orderNumber || '--'}</div>
-                <div class="text-xs text-slate-400 mt-1">التاريخ: ${formatDate(order.date)}</div>
-              </div>
-              <span class="status-badge ${statusClass}">${order.status || 'جاري المراجعة'}</span>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm mb-4">
-              <div><span class="text-slate-400">المستلم:</span> ${order.name || '--'}</div>
-              <div><span class="text-slate-400">الهاتف:</span> ${order.phone || '--'}</div>
-              <div><span class="text-slate-400">هاتف بديل:</span> ${order.phone2 || '--'}</div>
-              <div><span class="text-slate-400">المحافظة / المدينة:</span> ${order.gov || '--'} - ${order.city || '--'}</div>
-              <div><span class="text-slate-400">منطقة الوصول:</span> ${order.arrivalArea || '--'}</div>
-              <div><span class="text-slate-400">الشارع:</span> ${order.street || '--'}</div>
-              <div><span class="text-slate-400">الوزن:</span> ${order.weight || '--'} كجم</div>
-              <div><span class="text-slate-400">التحصيل:</span> ${order.amount || '--'} ج.م</div>
-              <div><span class="text-slate-400">نوع الشحن:</span> ${order.type || '--'}</div>
-              <div><span class="text-slate-400">كود التتبع:</span> <span class="text-sky-300">${order.trackingCode || '--'}</span></div>
-            </div>
-
-            <div class="rounded-2xl border border-slate-700/60 bg-slate-900/40 p-4 mb-3">
-              <div class="text-xs text-slate-400 mb-1">حالة الأوردر الحالية</div>
-              <div class="text-sm font-bold text-cyan-300">${currentStage}</div>
-            </div>
-
-            ${(order.noteLoc || order.noteOrd) ? `
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                <div class="rounded-2xl bg-slate-900/35 border border-slate-700/40 p-3">
-                  <div class="text-xs text-slate-400 mb-1">ملاحظات مكان التسليم</div>
-                  <div class="text-white">${order.noteLoc || '--'}</div>
-                </div>
-                <div class="rounded-2xl bg-slate-900/35 border border-slate-700/40 p-3">
-                  <div class="text-xs text-slate-400 mb-1">ملاحظات الأوردر</div>
-                  <div class="text-white">${order.noteOrd || '--'}</div>
-                </div>
-              </div>
-            ` : ''}
-          </div>
-        `;
-
-        container.innerHTML += card;
-      });
-
-      updateStats(orders);
-    } catch (e) {
-      document.getElementById('ordersList').innerHTML = `
-        <div class="glass-card p-8 text-center">
-          <div class="text-red-300 font-bold">تعذر تحميل الشحنات</div>
-        </div>
-      `;
-    }
-  }
-
-  function formatDate(dateValue) {
-    try {
-      return new Date(dateValue).toLocaleString('ar-EG');
-    } catch {
-      return dateValue || '--';
-    }
-  }
-
-  function updateStats(orders) {
-    const total = orders.length;
-    const delivered = orders.filter(o => o.status === 'تم التوصيل').length;
-    const pending = orders.filter(o => o.status !== 'تم التوصيل').length;
-
-    document.getElementById('statTotal').innerText = total;
-    document.getElementById('statPending').innerText = pending;
-    document.getElementById('statDelivered').innerText = delivered;
-  }
-
-  function getStatusClass(status) {
-    if (status === 'تم التوصيل') return 'status-delivered';
-    if (status === 'تم الشحن') return 'status-shipped';
-    if (status === 'ملغي') return 'status-cancelled';
-    return 'status-pending';
-  }
-
-  // ============================
-  // فتح / إغلاق الفورم
-  // ============================
-  function openOrderForm() {
-    document.getElementById('orderModal').classList.remove('hidden');
-    loadGovernorates();
-
-    document.getElementById('rName').value = '';
-    document.getElementById('rPhone').value = '';
-    document.getElementById('rPhone2').value = '';
-    document.getElementById('gov').value = '';
-    document.getElementById('city').innerHTML = '<option value="">اختر المدينة</option>';
-    document.getElementById('arrivalArea').value = '';
-    document.getElementById('street').value = '';
-    document.getElementById('weight').value = '';
-    document.getElementById('amount').value = '';
-    document.getElementById('noteLoc').value = '';
-    document.getElementById('noteOrd').value = '';
-
-    selectType('تسليم طبيعي', 't1');
-  }
-
-  function closeOrderForm() {
-    document.getElementById('orderModal').classList.add('hidden');
-  }
-
-  // ============================
-  // إرسال شحنة
-  // ============================
-  async function submitOrder() {
-    const name = document.getElementById('rName').value.trim();
-    const phone = document.getElementById('rPhone').value.trim();
-    const phone2 = document.getElementById('rPhone2').value.trim();
-    const gov = document.getElementById('gov').value;
-    const city = document.getElementById('city').value;
-    const arrivalArea = document.getElementById('arrivalArea').value.trim();
-    const street = document.getElementById('street').value.trim();
-    const weight = parseFloat(document.getElementById('weight').value);
-    const amount = document.getElementById('amount').value.trim();
-    const noteLoc = document.getElementById('noteLoc').value.trim();
-    const noteOrd = document.getElementById('noteOrd').value.trim();
-
-    if (!name || !phone || !gov || !city || !arrivalArea || !street || !weight || !amount) {
-      return alert("يرجى ملء جميع الحقول الأساسية");
-    }
-
-    if (weight > 30) {
-      return alert("وزن البضاعة يجب ألا يزيد عن 30 كجم");
-    }
-
-    const ip = await getClientIP();
-
-    const payload = {
-      email: currentUserEmail,
-      name,
-      rPhone: phone,
-      rPhone2: phone2,
-      gov,
-      city,
-      arrivalArea,
-      street,
-      weight,
-      amount,
-      type: selectedShipType,
-      noteLoc,
-      noteOrd,
-      ip
+    // =========================
+    // المحافظات والمدن
+    // =========================
+    const egyptGovernorates = {
+        "القاهرة": ["المعادي", "التجمع الخامس", "مدينة نصر", "وسط البلد", "مصر الجديدة", "شبرا", "العباسية", "الزمالك"],
+        "الجيزة": ["أكتوبر", "الشيخ زايد", "الهرم", "فيصل", "العجوزة", "المهندسين", "البدرشين", "الصف"],
+        "الإسكندرية": ["المنتزه", "سيدي جابر", "محرم بك", "العجمي", "برج العرب", "الدخيلة"],
+        "البحيرة": ["دمنهور", "كفر الدوار", "أبو حمص", "رشيد", "إيتاي البارود"],
+        "الشرقية": ["الزقازيق", "العاشر من رمضان", "منيا القمح", "بلبيس", "أبو كبير"],
+        "الدقهلية": ["المنصورة", "طلخا", "ميت غمر", "أجا", "شربين"],
+        "المنوفية": ["شبين الكوم", "السادات", "منوف", "الباجور", "قويسنا"],
+        "القليوبية": ["بنها", "شبرا الخيمة", "قليوب", "الخانكة", "طوخ"],
+        "الغربية": ["طنطا", "المحلة الكبرى", "سمنود", "زفتى", "بسيون"],
+        "كفر الشيخ": ["كفر الشيخ", "دسوق", "بيلا", "فوه", "الرياض"],
+        "بورسعيد": ["بورسعيد", "الضواحي"],
+        "السويس": ["السويس", "الأربعين"],
+        "الإسماعيلية": ["الإسماعيلية", "فايد", "التل الكبير"],
+        "دمياط": ["دمياط", "فارسكور", "كفر سعد", "الزرقا"],
+        "أسوان": ["أسوان", "إدفو", "كوم أمبو", "نصر النوبة"],
+        "الأقصر": ["الأقصر", "البياضية", "القرنة", "إسنا", "أرمنت"],
+        "قنا": ["قنا", "نقادة", "قفط", "فرشوط"],
+        "سوهاج": ["سوهاج", "أخميم", "البلينا", "طهطا"],
+        "أسيوط": ["أسيوط", "ديروط", "الفتح", "أبنوب", "القوصية"],
+        "المنيا": ["المنيا", "بني مزار", "مطاي", "سمالوط", "ملوي"],
+        "بني سويف": ["بني سويف", "الواسطى", "ناصر", "ببا"],
+        "الفيوم": ["الفيوم", "طامية", "سنورس", "إبشواي"],
+        "شمال سيناء": ["العريش", "الشيخ زويد", "رفح"],
+        "جنوب سيناء": ["الطور", "شرم الشيخ", "دهب", "نويبع", "رأس سدر"],
+        "البحر الأحمر": ["الغردقة", "رأس غارب", "القصير", "مرسى علم"],
+        "الوادي الجديد": ["الخارجة", "الداخلة", "الفرافرة", "بلاط"],
+        "مطروح": ["مرسى مطروح", "الضبعة", "السلوم", "سيوة"]
     };
 
-    const btn = document.getElementById('submitOrderBtn');
-    btn.innerText = "جاري الحفظ...";
-    btn.disabled = true;
+    // =========================
+    // متغيرات عامة
+    // =========================
+    let currentUserEmail = null;
+    let currentSessionToken = null;
+    let tempEmail = null;
+    let generatedOTP = null;
+    let selectedShipType = "تسليم طبيعي";
 
-    try {
-      await fetch(SHEET_API, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      });
+    // خاص بتغيير كلمة المرور
+    let resetEmail = null;
+    let resetOTP = null;
 
-      alert("تم تسجيل الشحنة بنجاح");
-      closeOrderForm();
-      setTimeout(() => {
-        loadUserOrders();
-      }, 1200);
-
-    } catch (e) {
-      alert("حدث خطأ أثناء حفظ الشحنة");
-    } finally {
-      btn.innerText = "تأكيد الشحنة";
-      btn.disabled = false;
+    // =========================
+    // Device ID
+    // =========================
+    function getDeviceId() {
+        let deviceId = localStorage.getItem("deviceId");
+        if (!deviceId) {
+            deviceId = "DEV-" + Math.random().toString(36).substring(2) + Date.now();
+            localStorage.setItem("deviceId", deviceId);
+        }
+        return deviceId;
     }
-  }
 
-  // ============================
-  // تسجيل الخروج
-  // ============================
-  function logout() {
-    localStorage.removeItem('userEmail');
-    currentUserEmail = null;
-    showScreen('loginScreen');
-    document.getElementById('loginEmail').value = '';
-    document.getElementById('loginPassword').value = '';
-  }
+    // =========================
+    // واجهات
+    // =========================
+    function showScreen(id) {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('otpSendScreen').classList.add('hidden');
+        document.getElementById('otpVerifyScreen').classList.add('hidden');
+        document.getElementById('resetSendScreen').classList.add('hidden');
+        document.getElementById('resetVerifyScreen').classList.add('hidden');
+        document.getElementById('dashboardScreen').classList.add('hidden');
 
-  // ============================
-  // بدء التشغيل
-  // ============================
-  window.onload = () => {
-    const savedEmail = localStorage.getItem('userEmail');
+        document.getElementById(id).classList.remove('hidden');
 
-    if (savedEmail) {
-      currentUserEmail = savedEmail;
+        if (id === 'dashboardScreen') {
+            document.getElementById('fab').classList.remove('hidden');
+            loadUserOrders();
+        } else {
+            document.getElementById('fab').classList.add('hidden');
+        }
+    }
 
-      fetch(`${SHEET_API}?action=checkSession&email=${encodeURIComponent(savedEmail)}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.valid) {
-            showScreen('dashboardScreen');
-          } else {
-            localStorage.removeItem('userEmail');
+    function backToLogin() {
+        showScreen('loginScreen');
+    }
+
+    function showOtpScreen() {
+        showScreen('otpSendScreen');
+    }
+
+    function showResetScreen() {
+        showScreen('resetSendScreen');
+
+        if (currentUserEmail) {
+            document.getElementById('resetEmail').value = currentUserEmail;
+        } else {
+            document.getElementById('resetEmail').value = '';
+        }
+    }
+
+    // =========================
+    // المحافظات والمدن
+    // =========================
+    function loadGovernorates() {
+        const govSelect = document.getElementById('gov');
+        govSelect.innerHTML = '<option value="">4) اختر المحافظة</option>';
+        Object.keys(egyptGovernorates).sort().forEach(g => {
+            govSelect.innerHTML += `<option value="${g}">${g}</option>`;
+        });
+    }
+
+    function loadCities() {
+        const gov = document.getElementById('gov').value;
+        const citySelect = document.getElementById('city');
+        citySelect.innerHTML = '<option value="">5) اختر المدينة</option>';
+        if (egyptGovernorates[gov]) {
+            egyptGovernorates[gov].forEach(c => {
+                citySelect.innerHTML += `<option value="${c}">${c}</option>`;
+            });
+        }
+    }
+
+    function selectType(v, id) {
+        selectedShipType = v;
+        document.getElementById('t1').classList.remove('active-pill');
+        document.getElementById('t2').classList.remove('active-pill');
+        document.getElementById(id).classList.add('active-pill');
+    }
+
+    // =========================
+    // IP
+    // =========================
+    async function getClientIP() {
+        try {
+            const res = await fetch('https://api.ipify.org?format=json');
+            const data = await res.json();
+            return data.ip;
+        } catch(e) {
+            console.warn("فشل الحصول على IP", e);
+            return "unknown";
+        }
+    }
+
+    // =========================
+    // تسجيل الدخول
+    // =========================
+    async function loginWithPassword() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const deviceId = getDeviceId();
+
+        if (!email || !password) return alert("أدخل البريد وكلمة المرور");
+
+        const url = `${SHEET_API}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&deviceId=${encodeURIComponent(deviceId)}`;
+
+        try {
+            const response = await fetch(url);
+            const result = await response.json();
+
+            if (result.success) {
+                currentUserEmail = email;
+                currentSessionToken = result.token;
+
+                localStorage.setItem('userEmail', email);
+                localStorage.setItem('sessionToken', result.token);
+
+                showScreen('dashboardScreen');
+            } else {
+                alert(result.error || "بريد أو كلمة مرور غير صحيحة");
+            }
+        } catch (e) {
+            alert("تعذر الاتصال بالخادم");
+        }
+    }
+
+    // =========================
+    // التسجيل
+    // =========================
+    async function sendOTP() {
+        const email = document.getElementById('regEmail').value.trim();
+        if (!email.includes("@")) return alert("بريد غير صحيح");
+
+        tempEmail = email;
+        generatedOTP = Math.floor(1000 + Math.random() * 9000);
+
+        const btn = document.getElementById('sendOtpBtn');
+        btn.innerText = "جارٍ الإرسال...";
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(FORMSPREE_URL, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: tempEmail,
+                    message: `كود التحقق الخاص بإنشاء الحساب هو: ${generatedOTP}`
+                })
+            });
+
+            if (response.ok) {
+                alert("تم إرسال الكود، تفقد بريدك الإلكتروني");
+                showScreen('otpVerifyScreen');
+            } else {
+                alert("فشل الإرسال، تأكد من إعدادات Formspree");
+            }
+        } catch(e) {
+            alert("خطأ في الاتصال");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "إرسال كود التحقق";
+        }
+    }
+
+    async function verifyAndRegister() {
+        const enteredOtp = document.getElementById('otpCode').value.trim();
+        const newPass = document.getElementById('newPassword').value.trim();
+
+        if (enteredOtp != generatedOTP) return alert("الكود غير صحيح");
+        if (newPass.length < 4) return alert("كلمة المرور يجب أن تكون 4 أحرف على الأقل");
+
+        try {
+            const url = `${SHEET_API}?action=register&email=${encodeURIComponent(tempEmail)}&password=${encodeURIComponent(newPass)}`;
+            const response = await fetch(url);
+            const result = await response.json();
+
+            if (result.success) {
+                alert("تم إنشاء الحساب بنجاح، يمكنك تسجيل الدخول الآن");
+                showScreen('loginScreen');
+
+                document.getElementById('regEmail').value = '';
+                document.getElementById('otpCode').value = '';
+                document.getElementById('newPassword').value = '';
+            } else {
+                alert("فشل التسجيل: " + (result.error || "البريد موجود مسبقاً"));
+            }
+        } catch(e) {
+            alert("تعذر الاتصال بالخادم");
+        }
+    }
+
+    // =========================
+    // تغيير كلمة المرور
+    // =========================
+    async function sendResetOTP() {
+        const email = document.getElementById('resetEmail').value.trim();
+        if (!email || !email.includes("@")) return alert("أدخل بريد إلكتروني صحيح");
+
+        resetEmail = email;
+        resetOTP = Math.floor(1000 + Math.random() * 9000);
+
+        const btn = document.getElementById('sendResetOtpBtn');
+        btn.innerText = "جارٍ الإرسال...";
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(FORMSPREE_URL, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: resetEmail,
+                    message: `كود تغيير كلمة المرور الخاص بك هو: ${resetOTP}`
+                })
+            });
+
+            if (response.ok) {
+                alert("تم إرسال كود التحقق إلى بريدك الإلكتروني");
+                showScreen('resetVerifyScreen');
+            } else {
+                alert("فشل إرسال الكود. تأكد من إعدادات Formspree");
+            }
+        } catch (e) {
+            alert("حدث خطأ أثناء الإرسال");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "إرسال كود التحقق";
+        }
+    }
+
+    async function verifyAndChangePassword() {
+        const enteredOtp = document.getElementById('resetOtpCode').value.trim();
+        const newPassword = document.getElementById('resetNewPassword').value.trim();
+
+        if (!enteredOtp) return alert("أدخل كود التحقق");
+        if (enteredOtp != resetOTP) return alert("كود التحقق غير صحيح");
+        if (!newPassword || newPassword.length < 4) return alert("كلمة المرور يجب أن تكون 4 أحرف على الأقل");
+
+        try {
+            const url = `${SHEET_API}?action=changePassword&email=${encodeURIComponent(resetEmail)}&newPassword=${encodeURIComponent(newPassword)}`;
+            const response = await fetch(url);
+            const result = await response.json();
+
+            if (result.success) {
+                alert("تم تغيير كلمة المرور بنجاح");
+
+                document.getElementById('resetOtpCode').value = '';
+                document.getElementById('resetNewPassword').value = '';
+
+                if (currentUserEmail === resetEmail) {
+                    await logout();
+                } else {
+                    showScreen('loginScreen');
+                }
+            } else {
+                alert(result.error || "فشل تغيير كلمة المرور");
+            }
+        } catch (e) {
+            alert("تعذر الاتصال بالخادم");
+        }
+    }
+
+    // =========================
+    // عرض الطلبات
+    // =========================
+    async function loadUserOrders() {
+        if (!currentUserEmail) return;
+
+        try {
+            const url = `${SHEET_API}?action=getOrders&email=${encodeURIComponent(currentUserEmail)}`;
+            const response = await fetch(url);
+            const orders = await response.json();
+
+            const container = document.getElementById('ordersList');
+
+            if (!orders.length) {
+                container.innerHTML = '<div class="text-center text-slate-300 py-10">لا توجد شحنات حتى الآن</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+
+            orders.reverse().forEach(order => {
+                const statusClass = getStatusClass(order.status);
+
+                const card = `
+                    <div class="order-card">
+                        <div class="flex justify-between items-center flex-wrap gap-3">
+                            <span class="font-extrabold text-lg">رقم الشحنة: ${order.orderNumber || '--'}</span>
+                            <span class="status-badge ${statusClass}">${order.status || 'جاري المراجعة'}</span>
+                        </div>
+
+                        <div class="text-sm text-slate-300 mt-2">التاريخ: ${formatDate(order.date)}</div>
+                        <div class="text-sm mt-1">المستلم: ${order.name || '--'}</div>
+                        <div class="text-sm mt-1">الهاتف: ${order.phone || '--'} ${order.phone2 ? `- ${order.phone2}` : ''}</div>
+                        <div class="text-sm mt-1">العنوان: ${order.gov || '--'} - ${order.city || '--'} - ${order.area || '--'} - ${order.street || '--'}</div>
+                        <div class="text-sm mt-1">الوزن: ${order.weight || '--'} كجم</div>
+                        <div class="text-sm mt-1">المبلغ المطلوب: ${order.amount || '--'} ج.م</div>
+                        <div class="text-sm mt-1">نوع الشحن: ${order.type || '--'}</div>
+
+                        ${order.trackingCode ? `<div class="text-sm text-sky-300 mt-2">كود التتبع: ${order.trackingCode}</div>` : ''}
+
+                        <div class="sub-state-box">
+                            <div class="font-bold mb-1 text-sky-300">الحالة الحالية للأوردر:</div>
+                            <div>${order.currentState ? order.currentState : 'لم يتم تحديث الحالة الحالية بعد'}</div>
+                        </div>
+                    </div>
+                `;
+
+                container.innerHTML += card;
+            });
+
+        } catch (e) {
+            document.getElementById('ordersList').innerHTML = '<div class="text-center text-red-400 py-8">تعذر تحميل الشحنات</div>';
+        }
+    }
+
+    function getStatusClass(status) {
+        if (status === 'تم التوصيل') return 'status-delivered';
+        if (status === 'تم الشحن') return 'status-shipped';
+        if (status === 'ملغي') return 'status-cancelled';
+        return 'status-pending';
+    }
+
+    function formatDate(dateValue) {
+        try {
+            return new Date(dateValue).toLocaleString('ar-EG');
+        } catch {
+            return dateValue || '--';
+        }
+    }
+
+    // =========================
+    // مودال الشحنة
+    // =========================
+    function openOrderForm() {
+        document.getElementById('orderModal').classList.remove('hidden');
+        loadGovernorates();
+
+        document.getElementById('rName').value = '';
+        document.getElementById('rPhone').value = '';
+        document.getElementById('rPhone2').value = '';
+        document.getElementById('gov').value = '';
+        document.getElementById('city').innerHTML = '<option value="">5) اختر المدينة</option>';
+        document.getElementById('area').value = '';
+        document.getElementById('street').value = '';
+        document.getElementById('weight').value = '';
+        document.getElementById('amount').value = '';
+        document.getElementById('noteLoc').value = '';
+        document.getElementById('noteOrd').value = '';
+
+        selectedShipType = "تسليم طبيعي";
+        document.getElementById('t1').classList.add('active-pill');
+        document.getElementById('t2').classList.remove('active-pill');
+    }
+
+    function closeOrderForm() {
+        document.getElementById('orderModal').classList.add('hidden');
+    }
+
+    // =========================
+    // إرسال شحنة
+    // =========================
+    async function submitOrder() {
+        const name = document.getElementById('rName').value.trim();
+        const phone = document.getElementById('rPhone').value.trim();
+        const phone2 = document.getElementById('rPhone2').value.trim();
+        const gov = document.getElementById('gov').value;
+        const city = document.getElementById('city').value;
+        const area = document.getElementById('area').value.trim();
+        const street = document.getElementById('street').value.trim();
+        const weight = document.getElementById('weight').value.trim();
+        const amount = document.getElementById('amount').value.trim();
+        const noteLoc = document.getElementById('noteLoc').value.trim();
+        const noteOrd = document.getElementById('noteOrd').value.trim();
+
+        if (!name || !phone || !gov || !city || !area || !street || !weight || !amount) {
+            return alert("يرجى ملء جميع الحقول المطلوبة");
+        }
+
+        if (parseFloat(weight) > 30) {
+            return alert("وزن البضاعة يجب ألا يزيد عن 30 كجم");
+        }
+
+        const ip = await getClientIP();
+
+        const payload = {
+            email: currentUserEmail,
+            name: name,
+            rPhone: phone,
+            rPhone2: phone2,
+            gov: gov,
+            city: city,
+            area: area,
+            street: street,
+            weight: weight,
+            amount: amount,
+            type: selectedShipType,
+            ip: ip,
+            noteLoc: noteLoc,
+            noteOrd: noteOrd
+        };
+
+        const btn = document.getElementById('submitOrderBtn');
+        btn.innerText = "جاري الحفظ...";
+        btn.disabled = true;
+
+        try {
+            await fetch(SHEET_API, {
+                method: "POST",
+                mode: "no-cors",
+                body: JSON.stringify(payload)
+            });
+
+            alert("تم تسجيل الشحنة بنجاح");
+            closeOrderForm();
+            loadUserOrders();
+        } catch(e) {
+            alert("حدث خطأ أثناء الحفظ");
+        } finally {
+            btn.innerText = "تأكيد الشحنة";
+            btn.disabled = false;
+        }
+    }
+
+    // =========================
+    // تسجيل الخروج
+    // =========================
+    async function logout() {
+        try {
+            if (currentUserEmail && currentSessionToken) {
+                await fetch(`${SHEET_API}?action=logout&email=${encodeURIComponent(currentUserEmail)}&token=${encodeURIComponent(currentSessionToken)}`);
+            }
+        } catch (e) {
+            console.warn("تعذر تسجيل الخروج من السيرفر");
+        }
+
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('sessionToken');
+
+        currentUserEmail = null;
+        currentSessionToken = null;
+
+        showScreen('loginScreen');
+
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
+    }
+
+    // =========================
+    // عند تحميل الصفحة
+    // =========================
+    window.onload = () => {
+        const savedEmail = localStorage.getItem('userEmail');
+        const savedToken = localStorage.getItem('sessionToken');
+
+        if (savedEmail && savedToken) {
+            currentUserEmail = savedEmail;
+            currentSessionToken = savedToken;
+
+            fetch(`${SHEET_API}?action=checkSession&email=${encodeURIComponent(savedEmail)}&token=${encodeURIComponent(savedToken)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.valid) {
+                        showScreen('dashboardScreen');
+                    } else {
+                        localStorage.removeItem('userEmail');
+                        localStorage.removeItem('sessionToken');
+                        showScreen('loginScreen');
+                    }
+                })
+                .catch(() => showScreen('loginScreen'));
+        } else {
             showScreen('loginScreen');
-          }
-        })
-        .catch(() => showScreen('loginScreen'));
-    } else {
-      showScreen('loginScreen');
-    }
-  };
+        }
+    };
 </script>
 </body>
-</html>
+                      </html>
