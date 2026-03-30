@@ -974,7 +974,7 @@
     document.getElementById('orderModal').classList.add('hidden');
   }
 
-  // =================== إرسال شحنة ===================
+  // =================== إرسال شحنة إلى كلا الجدولين ===================
   async function submitOrder() {
     const name = document.getElementById('rName').value.trim();
     const phone = document.getElementById('rPhone').value.trim();
@@ -1018,17 +1018,26 @@
     btn.disabled = true;
 
     try {
+      // إرسال إلى Sheet1
       await fetch(SHEET_API, {
         method: "POST",
         mode: "no-cors",
         body: JSON.stringify(payload)
       });
 
-      alert("تم تسجيل الشحنة بنجاح");
+      // إرسال إلى Sheet2
+      await fetch(SECOND_SHEET_API, {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify(payload)
+      });
+
+      alert("تم تسجيل الشحنة بنجاح في كلا الجدولين");
       closeOrderForm();
       setTimeout(loadUserOrders, 1200);
     } catch(e) {
-      alert("حدث خطأ أثناء الحفظ");
+      console.error("خطأ في الحفظ:", e);
+      alert("حدث خطأ أثناء الحفظ في أحد الجداول، لكن ربما تم الحفظ في الآخر.");
     } finally {
       btn.innerHTML = 'تأكيد الشحنة';
       btn.disabled = false;
